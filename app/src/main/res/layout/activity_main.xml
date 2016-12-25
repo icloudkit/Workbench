@@ -190,7 +190,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"
-            android:layout_weight="0.1"
+            android:layout_weight="0.3"
             android:background="@color/deepGray"
             android:gravity="center_vertical"
             android:paddingLeft="8dp"
