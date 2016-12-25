@@ -1,177 +1,208 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
-    android:background="@color/black"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="cn.com.teamlink.workbench.MainActivity">
+    android:fitsSystemWindows="true"
+    tools:context="cn.com.teamlink.workbench.TestActivity">
 
-    <GridLayout
-        android:id="@+id/gridLayout"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:theme="@style/AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/activity_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
         android:orientation="vertical"
-        android:columnCount="3"
-        android:background="@android:color/background_dark"
-        android:rowCount="2"
-        android:layout_margin="0dp"
-        android:padding="0dp"
-        android:horizontalSpacing="0dp"
-        android:gravity="center">
+        tools:context="cn.com.teamlink.workbench.MainActivity">
 
-        <Button
-            android:background="@drawable/button_selector_primary_deep_gray"
-            android:text="计划停机"
-            android:textStyle="bold"
-            android:textSize="40dp"
-            android:textColor="@color/orange"
-            android:layout_width="wrap_content"
+        <GridLayout
+            android:id="@+id/gridLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
             android:layout_margin="0dp"
+            android:layout_weight="1"
+            android:background="@android:color/background_dark"
+            android:columnCount="3"
+            android:gravity="center"
+            android:horizontalSpacing="0dp"
+            android:orientation="vertical"
             android:padding="0dp"
-            android:id="@+id/button" />
+            android:rowCount="2">
 
-        <Button
-            android:background="@drawable/button_selector_primary_deep_gray"
-            android:text="待人开机"
-            android:textStyle="bold"
-            android:textSize="40dp"
-            android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_rowWeight="1"
+                android:background="@drawable/button_selector_primary_deep_gray"
+                android:padding="0dp"
+                android:text="计划停机"
+                android:textColor="@color/orange"
+                android:textSize="40dp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_rowWeight="1"
+                android:background="@drawable/button_selector_primary_deep_gray"
+                android:padding="0dp"
+                android:text="待人开机"
+                android:textSize="40dp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/button4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_rowWeight="1"
+                android:background="@drawable/button_selector_primary_deep_gray"
+                android:padding="0dp"
+                android:text="待料"
+                android:textSize="40dp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/button5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_rowWeight="1"
+                android:background="@drawable/button_selector_primary_deep_gray"
+                android:padding="0dp"
+                android:text="换模"
+                android:textSize="40dp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/button6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_rowWeight="1"
+                android:background="@drawable/button_selector_primary_deep_gray"
+                android:padding="0dp"
+                android:text="修模"
+                android:textSize="40dp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/button3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_rowWeight="1"
+                android:background="@drawable/button_selector_primary_deep_gray"
+                android:padding="0dp"
+                android:text="生产"
+                android:textSize="40dp"
+                android:textStyle="bold" />
+        </GridLayout>
+
+        <GridLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
             android:layout_margin="0dp"
+            android:layout_weight="0.5"
+            android:background="@android:color/background_dark"
+            android:columnCount="4"
+            android:gravity="center"
+            android:horizontalSpacing="0dp"
+            android:orientation="horizontal"
             android:padding="0dp"
-            android:id="@+id/button2" />
+            android:rowCount="1">
 
-        <Button
-            android:background="@drawable/button_selector_primary_deep_gray"
-            android:text="待料"
-            android:textStyle="bold"
-            android:textSize="40dp"
-            android:layout_width="wrap_content"
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_rowWeight="1"
+                android:background="@drawable/button_selector_primary_deep_gray"
+                android:padding="0dp"
+                android:text="试产"
+                android:textSize="40dp"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_rowWeight="1"
+                android:background="@drawable/button_selector_primary_deep_gray"
+                android:padding="0dp"
+                android:text="修机"
+                android:textSize="40dp"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_rowWeight="1"
+                android:background="@drawable/button_selector_primary_deep_gray"
+                android:padding="0dp"
+                android:text="保养"
+                android:textSize="40dp"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="0dp"
+                android:layout_rowWeight="1"
+                android:background="@drawable/button_selector_primary_deep_gray"
+                android:padding="0dp"
+                android:text="调机"
+                android:textSize="40dp"
+                android:textStyle="bold" />
+        </GridLayout>
+
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
-            android:layout_margin="0dp"
-            android:padding="0dp"
-            android:id="@+id/button4" />
+            android:layout_marginTop="1dp"
+            android:layout_weight="0.1"
+            android:background="@color/deepGray"
+            android:gravity="center_vertical"
+            android:paddingLeft="8dp"
+            android:text="当前机台：XXX 当前状态：正在XX，开始时间：XXXX"
+            android:textIsSelectable="false"
+            android:textStyle="bold" />
+    </LinearLayout>
 
-        <Button
-            android:background="@drawable/button_selector_primary_deep_gray"
-            android:text="换模"
-            android:textStyle="bold"
-            android:textSize="40dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
-            android:layout_margin="0dp"
-            android:padding="0dp"
-            android:id="@+id/button5" />
-
-        <Button
-            android:background="@drawable/button_selector_primary_deep_gray"
-            android:text="修模"
-            android:textStyle="bold"
-            android:textSize="40dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
-            android:layout_margin="0dp"
-            android:padding="0dp"
-            android:id="@+id/button6" />
-
-        <Button
-            android:background="@drawable/button_selector_primary_deep_gray"
-            android:text="生产"
-            android:textStyle="bold"
-            android:textSize="40dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
-            android:layout_margin="0dp"
-            android:padding="0dp"
-            android:id="@+id/button3" />
-    </GridLayout>
-
-    <GridLayout
-        android:layout_weight="0.5"
-        android:layout_width="match_parent"
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:columnCount="4"
-        android:background="@android:color/background_dark"
-        android:rowCount="1"
-        android:layout_margin="0dp"
-        android:padding="0dp"
-        android:horizontalSpacing="0dp"
-        android:gravity="center">
-        <Button
-            android:background="@drawable/button_selector_primary_deep_gray"
-            android:text="试产"
-            android:textStyle="bold"
-            android:textSize="40dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
-            android:layout_margin="0dp"
-            android:padding="0dp"/>
-
-        <Button
-            android:background="@drawable/button_selector_primary_deep_gray"
-            android:text="修机"
-            android:textStyle="bold"
-            android:textSize="40dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
-            android:layout_margin="0dp"
-            android:padding="0dp"/>
-
-        <Button
-            android:background="@drawable/button_selector_primary_deep_gray"
-            android:text="保养"
-            android:textStyle="bold"
-            android:textSize="40dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
-            android:layout_margin="0dp"
-            android:padding="0dp"/>
-
-        <Button
-            android:background="@drawable/button_selector_primary_deep_gray"
-            android:text="调机"
-            android:textStyle="bold"
-            android:textSize="40dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:layout_rowWeight="1"
-            android:layout_margin="0dp"
-            android:padding="0dp"/>
-    </GridLayout>
-
-    <TextView
-        android:background="@color/deepGray"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.1"
-        android:gravity="center_vertical"
-        android:text="当前机台：XXX 当前状态：正在XX，开始时间：XXXX"
-        android:textStyle="bold"
-        android:textIsSelectable="false"
-        android:paddingLeft="8dp"
-        android:layout_marginTop="1dp"/>
-</LinearLayout>
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@android:drawable/ic_dialog_email" />
+</android.support.design.widget.CoordinatorLayout>
