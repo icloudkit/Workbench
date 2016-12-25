@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
+    android:background="@color/black"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -22,7 +23,11 @@
         android:gravity="center">
 
         <Button
+            android:background="@drawable/button_selector_primary_deep_gray"
             android:text="计划停机"
+            android:textStyle="bold"
+            android:textSize="40dp"
+            android:textColor="@color/orange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
@@ -32,7 +37,10 @@
             android:id="@+id/button" />
 
         <Button
+            android:background="@drawable/button_selector_primary_deep_gray"
             android:text="待人开机"
+            android:textStyle="bold"
+            android:textSize="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
@@ -42,7 +50,10 @@
             android:id="@+id/button2" />
 
         <Button
+            android:background="@drawable/button_selector_primary_deep_gray"
             android:text="待料"
+            android:textStyle="bold"
+            android:textSize="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
@@ -52,7 +63,10 @@
             android:id="@+id/button4" />
 
         <Button
+            android:background="@drawable/button_selector_primary_deep_gray"
             android:text="换模"
+            android:textStyle="bold"
+            android:textSize="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
@@ -62,7 +76,10 @@
             android:id="@+id/button5" />
 
         <Button
+            android:background="@drawable/button_selector_primary_deep_gray"
             android:text="修模"
+            android:textStyle="bold"
+            android:textSize="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
@@ -72,7 +89,10 @@
             android:id="@+id/button6" />
 
         <Button
+            android:background="@drawable/button_selector_primary_deep_gray"
             android:text="生产"
+            android:textStyle="bold"
+            android:textSize="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
@@ -95,7 +115,10 @@
         android:horizontalSpacing="0dp"
         android:gravity="center">
         <Button
+            android:background="@drawable/button_selector_primary_deep_gray"
             android:text="试产"
+            android:textStyle="bold"
+            android:textSize="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
@@ -104,7 +127,10 @@
             android:padding="0dp"/>
 
         <Button
+            android:background="@drawable/button_selector_primary_deep_gray"
             android:text="修机"
+            android:textStyle="bold"
+            android:textSize="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
@@ -113,7 +139,10 @@
             android:padding="0dp"/>
 
         <Button
+            android:background="@drawable/button_selector_primary_deep_gray"
             android:text="保养"
+            android:textStyle="bold"
+            android:textSize="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
@@ -122,7 +151,10 @@
             android:padding="0dp"/>
 
         <Button
-            android:text="Button"
+            android:background="@drawable/button_selector_primary_deep_gray"
+            android:text="调机"
+            android:textStyle="bold"
+            android:textSize="40dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_columnWeight="1"
@@ -132,6 +164,7 @@
     </GridLayout>
 
     <TextView
+        android:background="@color/deepGray"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.1"
@@ -139,5 +172,6 @@
         android:text="当前机台：XXX 当前状态：正在XX，开始时间：XXXX"
         android:textStyle="bold"
         android:textIsSelectable="false"
-        android:paddingLeft="8dp" />
+        android:paddingLeft="8dp"
+        android:layout_marginTop="1dp"/>
 </LinearLayout>
