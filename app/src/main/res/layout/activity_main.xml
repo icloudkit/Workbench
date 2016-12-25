@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cn.com.teamlink.workbench.MainActivity">
+
+    <GridLayout
+        android:id="@+id/gridLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:columnCount="3"
+        android:background="@android:color/background_dark"
+        android:rowCount="2"
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:horizontalSpacing="0dp"
+        android:gravity="center">
+
+        <Button
+            android:text="计划停机"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:id="@+id/button" />
+
+        <Button
+            android:text="待人开机"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:id="@+id/button2" />
+
+        <Button
+            android:text="待料"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:id="@+id/button4" />
+
+        <Button
+            android:text="换模"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:id="@+id/button5" />
+
+        <Button
+            android:text="修模"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:id="@+id/button6" />
+
+        <Button
+            android:text="生产"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:id="@+id/button3" />
+    </GridLayout>
+
+    <GridLayout
+        android:layout_weight="0.5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:columnCount="4"
+        android:background="@android:color/background_dark"
+        android:rowCount="1"
+        android:layout_margin="0dp"
+        android:padding="0dp"
+        android:horizontalSpacing="0dp"
+        android:gravity="center">
+        <Button
+            android:text="试产"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="0dp"
+            android:padding="0dp"/>
+
+        <Button
+            android:text="修机"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="0dp"
+            android:padding="0dp"/>
+
+        <Button
+            android:text="保养"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="0dp"
+            android:padding="0dp"/>
+
+        <Button
+            android:text="Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:layout_rowWeight="1"
+            android:layout_margin="0dp"
+            android:padding="0dp"/>
+    </GridLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.1"
+        android:gravity="center_vertical"
+        android:text="当前机台：XXX 当前状态：正在XX，开始时间：XXXX"
+        android:textStyle="bold"
+        android:textIsSelectable="false"
+        android:paddingLeft="8dp" />
+</LinearLayout>
