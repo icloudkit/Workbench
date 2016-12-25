@@ -28,8 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
         // 用toolbar替换actionbar
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         // app logo
         // toolbar.setLogo(R.mipmap.ic_launcher);
         // title
@@ -38,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         // toolbar.setSubtitle(ToolBar subtitle");
         // 以上3个属性必须在setSupportActionBar(toolbar)之前调用
         setSupportActionBar(toolbar);
+
         // 设置导航Icon，必须在setSupportActionBar(toolbar)之后设置
         toolbar.setNavigationIcon(android.R.drawable.ic_menu_more);
         // 添加菜单点击事件
