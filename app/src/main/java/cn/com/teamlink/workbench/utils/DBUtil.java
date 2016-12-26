@@ -217,6 +217,6 @@ public class DBUtil {
     }
 
     public static void main(String[] args) {
-        DBUtil.query("SELECT * FROM mould_drive");
+        DBUtil.query("SELECT * FROM switch_status");
     }
 }
