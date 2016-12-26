@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                         new StringBuffer()
                                 .append(resultMap.get("local_addr").toString())
                                 .append(":")
-                                .append(resultMap.get("local_addr").toString()),
+                                .append(resultMap.get("serial_no").toString()),
                         Snackbar.LENGTH_LONG).show();
 
                 Log.i(
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                         new StringBuffer()
                                 .append(resultMap.get("local_addr").toString())
                                 .append(":")
-                                .append(resultMap.get("local_addr").toString())
+                                .append(resultMap.get("serial_no").toString())
                                 .toString()
                 );
 
