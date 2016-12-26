@@ -12,6 +12,9 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+/**
+ * 状态转换
+ */
 public class MainActivity extends AppCompatActivity {
 
     Toolbar toolbar = null;
@@ -71,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 该方法是用来加载菜单布局的
+     *
      * @param menu
      * @return
      */
@@ -81,18 +85,21 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private Toolbar.OnMenuItemClickListener onMenuItemClickListener=new Toolbar.OnMenuItemClickListener() {
+    private Toolbar.OnMenuItemClickListener onMenuItemClickListener = new Toolbar.OnMenuItemClickListener() {
         @Override
         public boolean onMenuItemClick(MenuItem menuItem) {
-            switch (menuItem.getItemId()){
-//                case R.id.action_search://因为使用android.support.v7.widget.SearchView类，可以在onCreateOptionsMenu(Menu menu)中直接设置监听事件
-//                    Snackbar.make(toolbar,"Click Search",Snackbar.LENGTH_SHORT).show();
-//                    break;
+            switch (menuItem.getItemId()) {
+                /*
+                //因为使用android.support.v7.widget.SearchView类，可以在onCreateOptionsMenu(Menu menu)中直接设置监听事件
+                case R.id.action_search:
+                    Snackbar.make(toolbar, "Click Search", Snackbar.LENGTH_SHORT).show();
+                    break;
+                */
                 case R.id.action_share:
-                    Snackbar.make(toolbar,"Click Share",Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(toolbar, "Click Share", Snackbar.LENGTH_SHORT).show();
                     break;
                 case R.id.action_more:
-                    Snackbar.make(toolbar,"Click More",Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(toolbar, "Click More", Snackbar.LENGTH_SHORT).show();
                     break;
             }
             return true;
