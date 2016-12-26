@@ -20,7 +20,7 @@ android {
 }
 
 dependencies {
-    compile 'mysql:mysql-connector-java:6.0.5'
+    compile 'mysql:mysql-connector-java:5.1.30'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

@@ -1,5 +1,7 @@
 package cn.com.teamlink.workbench.utils;
 
+import android.support.design.widget.Snackbar;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -7,12 +9,15 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
 import javax.sql.DataSource;
+
+import cn.com.teamlink.workbench.services.EquipmentServiceImpl;
 
 public class DBUtil {
 
@@ -26,7 +31,9 @@ public class DBUtil {
      */
     private static DataSource dataSource;
 
-    private static String url = "jdbc:mysql://127.0.0.1:3306/wbdata?useUnicode=true&characterEncoding=UTF-8";
+    // private static String url = "jdbc:mysql://127.0.0.1:3306/wbdata?useUnicode=true&characterEncoding=UTF-8";
+    // private static String url = "jdbc:mysql://192.168.0.18:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&maxReconnects=10";
+    private static String url = "jdbc:mysql://192.168.0.18:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
     private static String username = "root";
     private static String password = "root";
     private static String driverName = "com.mysql.jdbc.Driver";
@@ -71,10 +78,10 @@ public class DBUtil {
                 }
             } catch (ClassNotFoundException e) {
                 // logger.error(e.getMessage(), e);
-                throw new RuntimeException();
+                throw new RuntimeException(e);
             } catch (SQLException e) {
                 // logger.error(e.getMessage(), e);
-                throw new RuntimeException();
+                throw new RuntimeException(e);
             }
             // connection = dataSource.getConnection();
             // connection.setAutoCommit(true);
@@ -90,7 +97,7 @@ public class DBUtil {
                 connection.setAutoCommit(false);
             }
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
@@ -102,7 +109,7 @@ public class DBUtil {
                 connection.commit();
             }
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
@@ -116,7 +123,7 @@ public class DBUtil {
                 connection.commit();
             }
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
@@ -177,22 +184,28 @@ public class DBUtil {
     }
 
     public static List<Map<String, Object>> query(String sql, Object... args) {
-        List<Map<String, Object>> results = new ArrayList<>();
+        List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
         Connection connection = null;
         PreparedStatement pstmt = null;
         try {
             connection = getConnection();
             pstmt = connection.prepareStatement(sql);
+            for(int i = 0; i < args.length; i++){
+                pstmt.setObject(1, args[i]);
+            }
             ResultSet rs = pstmt.executeQuery();
             // int col = rs.getMetaData().getColumnCount();
             ResultSetMetaData meta = rs.getMetaData();
             while (rs.next()) {
+                Map<String, Object> rowMap = new LinkedHashMap<String, Object>();
                 int columnCount = meta.getColumnCount();
                 for (int i = 1; i <= columnCount; i++) {
                     String columnName = meta.getColumnName(i);
-                    rs.getObject(i);
-                    System.out.println(rs.getObject(columnName));
+                    // rs.getObject(i);
+                    rowMap.put(columnName, rs.getObject(i));
+                    // System.out.println(rs.getObject(columnName));
                 }
+                results.add(rowMap);
             }
         } catch (SQLException e) {
             // TODO Auto-generated catch block
@@ -213,10 +226,14 @@ public class DBUtil {
                 }
             }
         }
-        return null;
+        return results;
     }
 
-    public static void main(String[] args) {
-        DBUtil.query("SELECT * FROM switch_status");
+    public static void main(String[] args) throws Exception {
+        Map<String, Object> resultMap = new EquipmentServiceImpl().getSerialNumber("127.0.0.1");
+        System.out.println(new StringBuffer()
+                .append(resultMap.get("local_addr").toString())
+                .append(":")
+                .append(resultMap.get("serial_no").toString()));
     }
 }

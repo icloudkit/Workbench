@@ -1,8 +1,10 @@
 package cn.com.teamlink.workbench.services;
 
 import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Map;
 
-interface EquipmentService {
+public interface EquipmentService {
 
-    String getSerialNumber() throws UnknownHostException;
+    Map<String, Object> getSerialNumber(String localAddr) throws UnknownHostException;
 }

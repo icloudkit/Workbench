@@ -1,23 +1,38 @@
 package cn.com.teamlink.workbench;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.support.design.widget.FloatingActionButton;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
+
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.UnknownHostException;
+import java.util.Enumeration;
+import java.util.Map;
+
+import cn.com.teamlink.workbench.services.EquipmentService;
+import cn.com.teamlink.workbench.services.EquipmentServiceImpl;
 
 /**
  * 状态转换
  */
 public class MainActivity extends AppCompatActivity {
 
-    Toolbar toolbar = null;
+    private static final String TAG = "MainActivity";
+
+    private EquipmentService equipmentService = null;
+    private Toolbar toolbar = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +76,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         */
+
+        equipmentService = new EquipmentServiceImpl();
+        // 开启一个子线程，进行网络操作，等待有返回结果，使用handler通知UI
+        new Thread(networkTask).start();
     }
 
     @Override
@@ -71,6 +90,86 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onResume();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    /*
+    Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Bundle data = msg.getData();
+            String val = data.getString("data");
+            // getIntent().getSerializableExtra("data");
+            Log.i("mylog", "请求结果为：" + val);
+
+            // TODO UI界面的更新等相关操作
+        }
+    };
+    */
+
+    /**
+     * 网络操作相关的子线程
+     */
+    Runnable networkTask = new Runnable() {
+
+        @Override
+        public void run() {
+            // TODO 在这里进行网络请求相关操作
+
+            /*
+            SharedPreferences sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
+            // getString()第二个参数为缺省值，如果preference中不存在该key，将返回缺省值
+            String serialNo = sharedPreferences.getString("serial_no", "");
+            */
+
+            // 使用SharedPreferences进行数据存储
+            SharedPreferences sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            try {
+                Map<String, Object> resultMap = equipmentService.getSerialNumber(getLocalWIFIAddress());
+
+                // 本机IP，设备编号
+                editor.putString("local_addr", resultMap.get("local_addr").toString());
+                editor.putString("serial_no", resultMap.get("serial_no").toString());
+                editor.commit();
+
+                Snackbar.make(
+                        toolbar,
+                        new StringBuffer()
+                                .append(resultMap.get("local_addr").toString())
+                                .append(":")
+                                .append(resultMap.get("local_addr").toString()),
+                        Snackbar.LENGTH_LONG).show();
+
+                Log.i(
+                        TAG,
+                        new StringBuffer()
+                                .append(resultMap.get("local_addr").toString())
+                                .append(":")
+                                .append(resultMap.get("local_addr").toString())
+                                .toString()
+                );
+
+            } catch (UnknownHostException ex) {
+                Log.e(TAG, "获取本机IP地址失败！", ex);
+            } catch (Exception ex) {
+                Log.e(TAG, "获取设备信息失败！", ex);
+            }
+
+            /*
+            Message msg = new Message();
+            Bundle data = new Bundle();
+            data.putString("data", "value");
+            // data.putSerializable("data", "");
+            msg.setData(data);
+            handler.sendMessage(msg);
+            */
+        }
+    };
 
     /**
      * 该方法是用来加载菜单布局的
@@ -105,4 +204,37 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     };
+
+    // 获取本机WIFI
+    private String getLocalWIFIAddress() {
+        WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        // 获取32位整型IP地址
+        int ipAddress = wifiInfo.getIpAddress();
+
+        //返回整型地址转换成“*.*.*.*”地址
+        return String.format("%d.%d.%d.%d",
+                (ipAddress & 0xff), (ipAddress >> 8 & 0xff),
+                (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
+    }
+
+    // 3G网络IP
+    public static String getLocalWLANAddress() {
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                        // if (!inetAddress.isLoopbackAddress() && inetAddress
+                        // instanceof Inet6Address) {
+                        return inetAddress.getHostAddress().toString();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
