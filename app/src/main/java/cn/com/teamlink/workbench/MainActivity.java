@@ -49,14 +49,14 @@ public class MainActivity extends AppCompatActivity {
         // app logo
         // toolbar.setLogo(R.mipmap.ic_launcher);
         // title
-        toolbar.setTitle(R.string.app_name);
+        toolbar.setTitle(R.string.switch_status);
         // sub title
         // toolbar.setSubtitle(ToolBar subtitle");
         // 以上3个属性必须在setSupportActionBar(toolbar)之前调用
         setSupportActionBar(toolbar);
 
         // 设置导航Icon，必须在setSupportActionBar(toolbar)之后设置
-        toolbar.setNavigationIcon(android.R.drawable.ic_menu_more);
+        // toolbar.setNavigationIcon(android.R.drawable.ic_menu_more);
         // 添加菜单点击事件
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

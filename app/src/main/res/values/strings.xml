@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">状态转换</string>
+    <string name="app_name">联机管理</string>
+
+    <string name="switch_status">状态转换</string>
 </resources>
