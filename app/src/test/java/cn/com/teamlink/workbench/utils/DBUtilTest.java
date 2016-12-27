@@ -13,21 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.com.teamlink.workbench.services;
+package cn.com.teamlink.workbench.utils;
 
-import java.net.UnknownHostException;
+import org.junit.Test;
+
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.Assert.*;
+
 /**
- * EquipmentService.java
+ * DBUtilTest.java
  *
  * @author hongquanli <hongquanli@qq.com>
  * @version 1.0 2016年12月27日 上午11:38:34
  */
-public interface EquipmentService {
+public class DBUtilTest {
 
-    Map<String, Object> getEquipmentSerialNumber(String localAddr) throws UnknownHostException;
+    @Test
+    public void query() throws Exception {
+        List<Map<String, Object>> results = DBUtil.query("SELECT count(*) as row_count FROM enum_data");
+        System.out.println(results.get(0).get("row_count"));
+    }
 
-    Boolean switchEquipmentStatus(String serialNo, int status, String statsuDesc);
 }

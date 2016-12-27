@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2015 The CloudKit Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cn.com.teamlink.workbench.utils;
 
 import android.support.design.widget.Snackbar;
@@ -19,6 +34,12 @@ import javax.sql.DataSource;
 
 import cn.com.teamlink.workbench.services.EquipmentServiceImpl;
 
+/**
+ * DBUtil.java
+ *
+ * @author hongquanli <hongquanli@qq.com>
+ * @version 1.0 2016年12月27日 上午11:38:34
+ */
 public class DBUtil {
 
     /**
@@ -33,7 +54,8 @@ public class DBUtil {
 
     // private static String url = "jdbc:mysql://127.0.0.1:3306/wbdata?useUnicode=true&characterEncoding=UTF-8";
     // private static String url = "jdbc:mysql://192.168.0.18:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&maxReconnects=10";
-    private static String url = "jdbc:mysql://192.168.0.18:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
+    // private static String url = "jdbc:mysql://192.168.0.18:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
+    private static String url = "jdbc:mysql://127.0.0.1:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
     private static String username = "root";
     private static String password = "root";
     private static String driverName = "com.mysql.jdbc.Driver";
@@ -61,7 +83,7 @@ public class DBUtil {
     }
 
     /**
-     * Connection
+     * 获取数据库连接
      *
      * @return
      * @throws SQLException
@@ -90,6 +112,9 @@ public class DBUtil {
         return connection;
     }
 
+    /**
+     * 开始事务
+     */
     public static void startTransaction() {
         try {
             Connection connection = getConnection();
@@ -101,6 +126,9 @@ public class DBUtil {
         }
     }
 
+    /**
+     * 回滚事务
+     */
     public static void rollback() {
         try {
             Connection connection = getConnection();
@@ -149,30 +177,34 @@ public class DBUtil {
 
     /**
      * 执行更新，插入，删除语句
+     *
+     * @param sql
+     * @param args
+     * @return
      */
-    private static int execute(String sql, Object... args) {
+    public static int execute(String sql, Object... args) {
         Connection connection = null;
         int rowCount = 0;
         PreparedStatement pstmt = null;
         try {
             connection = getConnection();
             pstmt = connection.prepareStatement(sql);
-            for(int i = 0; i < args.length; i++){
-                pstmt.setObject(1, args[i]);
+            for (int i = 0; i < args.length; i++) {
+                pstmt.setObject(i + 1, args[i]);
             }
             rowCount = pstmt.executeUpdate();
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
-            if(pstmt != null) {
+            if (pstmt != null) {
                 try {
                     pstmt.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            if(connection != null) {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
@@ -183,6 +215,13 @@ public class DBUtil {
         return rowCount;
     }
 
+    /**
+     * 查询方法
+     *
+     * @param sql
+     * @param args
+     * @return
+     */
     public static List<Map<String, Object>> query(String sql, Object... args) {
         List<Map<String, Object>> results = new ArrayList<Map<String, Object>>();
         Connection connection = null;
@@ -190,8 +229,8 @@ public class DBUtil {
         try {
             connection = getConnection();
             pstmt = connection.prepareStatement(sql);
-            for(int i = 0; i < args.length; i++){
-                pstmt.setObject(1, args[i]);
+            for (int i = 0; i < args.length; i++) {
+                pstmt.setObject(i + 1, args[i]);
             }
             ResultSet rs = pstmt.executeQuery();
             // int col = rs.getMetaData().getColumnCount();
@@ -210,15 +249,15 @@ public class DBUtil {
         } catch (SQLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }finally {
-            if(pstmt != null) {
+        } finally {
+            if (pstmt != null) {
                 try {
                     pstmt.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             }
-            if(connection != null) {
+            if (connection != null) {
                 try {
                     connection.close();
                 } catch (SQLException e) {
@@ -229,11 +268,5 @@ public class DBUtil {
         return results;
     }
 
-    public static void main(String[] args) throws Exception {
-        Map<String, Object> resultMap = new EquipmentServiceImpl().getSerialNumber("127.0.0.1");
-        System.out.println(new StringBuffer()
-                .append(resultMap.get("local_addr").toString())
-                .append(":")
-                .append(resultMap.get("serial_no").toString()));
-    }
+
 }

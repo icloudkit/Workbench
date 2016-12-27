@@ -58,6 +58,8 @@ CREATE TABLE `mould` (
 -- ----------------------------
 INSERT INTO `mould` VALUES ('1', '192.168.0.105', '6b95cb3a-cb4e-11e6-952f-507b9db02f92');
 INSERT INTO `mould` VALUES ('2', '192.168.0.18', '6b95cb3a-cb4e-11e6-952f-507b9db02f92');
+INSERT INTO `mould` VALUES ('3', '192.168.1.169', '6b95cb3a-cb4e-11e6-952f-507b9db02f92');
+INSERT INTO `mould` VALUES ('4', '127.0.0.1', '6b95cb3a-cb4e-11e6-952f-507b9db02f92');
 
 -- ----------------------------
 -- Table structure for `switch_status`
