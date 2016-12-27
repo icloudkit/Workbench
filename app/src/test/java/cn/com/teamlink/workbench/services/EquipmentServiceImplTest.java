@@ -46,7 +46,18 @@ public class EquipmentServiceImplTest {
     public void switchEquipmentStatus() {
         System.out.println(EquipmentStatus.DEBUG_MACHINE.ordinal());
         System.out.println(EquipmentStatus.DEBUG_MACHINE.toString());
-        new EquipmentServiceImpl().switchEquipmentStatus("6b95cb3a-cb4e-11e6-952f-507b9db02f92", EquipmentStatus.DEBUG_MACHINE.ordinal(), EquipmentStatus.DEBUG_MACHINE.toString());
+        new EquipmentServiceImpl().switchEquipmentStatus(
+                "6b95cb3a-cb4e-11e6-952f-507b9db02f92",
+                EquipmentStatus.DEBUG_MACHINE.ordinal(),
+                EquipmentStatus.DEBUG_MACHINE.toString()
+        );
+    }
+
+    @Test
+    public void getEquipmentStatus() {
+        Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                .getEquipmentStatus("6b95cb3a-cb4e-11e6-952f-507b9db02f92");
+        System.out.println(equipmentStatus.get("status_desc"));
     }
 
 }

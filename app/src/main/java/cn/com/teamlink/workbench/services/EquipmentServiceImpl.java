@@ -81,4 +81,15 @@ public class EquipmentServiceImpl implements EquipmentService {
         int affectCount = DBUtil.execute(sql, status, statsuDesc, serialNo);
         return ((affectCount > 0)? true : false);
     }
+
+    @Override
+    public Map<String, Object> getEquipmentStatus(String serialNo) {
+        String sql = "SELECT equipment_name, type, type_desc, status, status_desc FROM equipment_status WHERE serial_no = ?";
+        List<Map<String, Object>> results = DBUtil.query(sql, serialNo);
+        if(results.size() > 0) {
+            return results.get(0);
+        } else {
+            throw new RuntimeException("找不到设备相关配置！");
+        }
+    }
 }

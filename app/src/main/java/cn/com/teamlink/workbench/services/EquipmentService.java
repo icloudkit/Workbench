@@ -30,4 +30,6 @@ public interface EquipmentService {
     Map<String, Object> getEquipmentSerialNumber(String localAddr) throws UnknownHostException;
 
     Boolean switchEquipmentStatus(String serialNo, int status, String statsuDesc);
+
+    public Map<String, Object> getEquipmentStatus(String serialNo);
 }
