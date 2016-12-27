@@ -22,6 +22,8 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -73,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String EQUIPMENT_STATUS_TEXT_TEMPLATE = "当前机台：%1$s 当前状态：%2$s，开始时间：%3$s";
 
+    private static final int STATUS_UPDATE_HANDLE = 0;
+
     private SharedPreferences preferences;
     private InputStreamVolleyRequest request = null;
 
@@ -114,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         // 开启一个子线程，进行网络操作，等待有返回结果，使用handler通知UI
         new Thread(networkTask).start();
 
-        request = new InputStreamVolleyRequest(Request.Method.GET, "http://archiving.oss-cn-shenzhen.aliyuncs.com/archives/766350979/2016/12/26/766350979E1201606250938516995/PDF/00000001.pdf?Expires=1482845185&OSSAccessKeyId=TMP.AQF-SHbVPp01OeqWo7mjKGirAWQYjZQKfwMxcXo7bRao4b6qRY4nnYU5iC-mADAtAhUA2sy_1WMqZ9jTF52jm3xbf7c3LqgCFCTDng8mE9vbGZz6oKAHlvhG6Li2&Signature=gXGufcNKmMY20sXC%2B1Rb%2FdxqcWs%3D", new Response.Listener<byte[]>() {
+        request = new InputStreamVolleyRequest(Request.Method.GET, "http://www.guanmaoyun.com/main.html", new Response.Listener<byte[]>() {
             @Override
             public void onResponse(byte[] bytes) {
                 HashMap<String, Object> map = new HashMap<String, Object>();
@@ -123,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
                         // Read file name from headers (We have configured API to send file name in "Content-Disposition" header in following format: "File-Name:File-Format" example "MyDoc:pdf"
                         String content = request.responseHeaders.get("Content-Disposition");
+                        /*
                         StringTokenizer st = new StringTokenizer(content, "=");
 
                         int numberOfTokens = st.countTokens();
@@ -133,8 +138,11 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         String filename = arrTag[1];
-                        filename = filename.replace(":", ".");
-                        Log.d("DEBUG::FILE NAME", filename);
+                        */
+
+                        String filename = "test.html";
+                        // filename = filename.replace(":", ".");
+                        Log.i("DEBUG::FILE NAME", filename);
 
                         InputStream input = null;
                         BufferedOutputStream output = null;
@@ -145,9 +153,22 @@ public class MainActivity extends AppCompatActivity {
                             input = new ByteArrayInputStream(bytes);
 
                             //Create a file on desired path and write stream data to it
-                            File path = Environment.getExternalStorageDirectory();
+                            // File path = Environment.getExternalStorageDirectory();
+                            // File sd = Environment.getExternalStorageDirectory();
+                            // sd.canWrite();
+
+                            // File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                            // File path = Environment.getDownloadCacheDirectory();
+                            File path = Environment.getDataDirectory();
+                            Log.i("DEBUG::DataDirectory:", Environment.getDataDirectory().getAbsolutePath());
+                            // new java.io.File((getActivity().getApplicationContext().getFileStreamPath("FileName.xml").getPath()));
+                            // org.apache.commons.io.FileUtils.copyInputStreamToFile(is, file);
+                            Log.i("DEBUG::FILE PATH", path.getAbsolutePath());
+
                             File file = new File(path, filename);
                             map.put("resume_path", file.toString());
+
+                            Log.i("DEBUG::FILE PATH", file.getAbsolutePath());
 
                             output = new BufferedOutputStream(new FileOutputStream(file));
                             byte data[] = new byte[1024];
@@ -198,29 +219,9 @@ public class MainActivity extends AppCompatActivity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
 
-        mEquipmentStatusTextView.setText("");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
-                            .getEquipmentStatus(preferences.getString("serial_no", ""));
+        // 更新状态
+        new Thread(statusUpdateTask).start();
 
-                    String value = String.format(
-                            EQUIPMENT_STATUS_TEXT_TEMPLATE,
-                            equipmentStatus.get("status_desc"),
-                            equipmentStatus.get("timestamp")
-                    );
-                    Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
-                    mEquipmentStatusTextView.setText(value);
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        }).start();
         super.onResume();
     }
 
@@ -354,6 +355,31 @@ public class MainActivity extends AppCompatActivity {
             switch (v.getId()) {
                 case R.id.scheduled_downtime_button:
                     // Toast.makeText(getApplicationContext(), "scheduled_downtime_button", Toast.LENGTH_SHORT).show();
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // 切换状态
+                                equipmentService.switchEquipmentStatus(
+                                        preferences.getString("serial_no", ""),
+                                        EquipmentStatus.STOPED.ordinal(),
+                                        EquipmentStatus.STOPED.toString()
+                                );
+
+                                equipmentService.writingEquipmentStatusLog(
+                                        preferences.getString("serial_no", ""),
+                                        preferences.getString("name", ""),
+                                        EquipmentStatus.STOPED.ordinal(),
+                                        EquipmentStatus.STOPED.toString()
+                                );
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
                     break;
                 case R.id.wait_start_button:
                     // Toast.makeText(getApplicationContext(), "wait_start_button", Toast.LENGTH_SHORT).show();
@@ -366,7 +392,15 @@ public class MainActivity extends AppCompatActivity {
                                 equipmentService.switchEquipmentStatus(
                                         preferences.getString("serial_no", ""),
                                         EquipmentStatus.WAIT_START.ordinal(),
-                                        EquipmentStatus.WAIT_START.toString());
+                                        EquipmentStatus.WAIT_START.toString()
+                                );
+
+                                equipmentService.writingEquipmentStatusLog(
+                                        preferences.getString("serial_no", ""),
+                                        preferences.getString("name", ""),
+                                        EquipmentStatus.WAIT_START.ordinal(),
+                                        EquipmentStatus.WAIT_START.toString()
+                                );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -386,7 +420,15 @@ public class MainActivity extends AppCompatActivity {
                                 equipmentService.switchEquipmentStatus(
                                         preferences.getString("serial_no", ""),
                                         EquipmentStatus.WAIT_MATERIAL.ordinal(),
-                                        EquipmentStatus.WAIT_MATERIAL.toString());
+                                        EquipmentStatus.WAIT_MATERIAL.toString()
+                                );
+
+                                equipmentService.writingEquipmentStatusLog(
+                                        preferences.getString("serial_no", ""),
+                                        preferences.getString("name", ""),
+                                        EquipmentStatus.WAIT_MATERIAL.ordinal(),
+                                        EquipmentStatus.WAIT_MATERIAL.toString()
+                                );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -411,7 +453,15 @@ public class MainActivity extends AppCompatActivity {
                                 equipmentService.switchEquipmentStatus(
                                         preferences.getString("serial_no", ""),
                                         EquipmentStatus.FIX_MOULD.ordinal(),
-                                        EquipmentStatus.FIX_MOULD.toString());
+                                        EquipmentStatus.FIX_MOULD.toString()
+                                );
+
+                                equipmentService.writingEquipmentStatusLog(
+                                        preferences.getString("serial_no", ""),
+                                        preferences.getString("name", ""),
+                                        EquipmentStatus.FIX_MOULD.ordinal(),
+                                        EquipmentStatus.FIX_MOULD.toString()
+                                );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -432,7 +482,15 @@ public class MainActivity extends AppCompatActivity {
                                 equipmentService.switchEquipmentStatus(
                                         preferences.getString("serial_no", ""),
                                         EquipmentStatus.PRODUCE.ordinal(),
-                                        EquipmentStatus.PRODUCE.toString());
+                                        EquipmentStatus.PRODUCE.toString()
+                                );
+
+                                equipmentService.writingEquipmentStatusLog(
+                                        preferences.getString("serial_no", ""),
+                                        preferences.getString("name", ""),
+                                        EquipmentStatus.PRODUCE.ordinal(),
+                                        EquipmentStatus.PRODUCE.toString()
+                                );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -453,7 +511,15 @@ public class MainActivity extends AppCompatActivity {
                                 equipmentService.switchEquipmentStatus(
                                         preferences.getString("serial_no", ""),
                                         EquipmentStatus.TRIAL_PRODUCE.ordinal(),
-                                        EquipmentStatus.TRIAL_PRODUCE.toString());
+                                        EquipmentStatus.TRIAL_PRODUCE.toString()
+                                );
+
+                                equipmentService.writingEquipmentStatusLog(
+                                        preferences.getString("serial_no", ""),
+                                        preferences.getString("name", ""),
+                                        EquipmentStatus.TRIAL_PRODUCE.ordinal(),
+                                        EquipmentStatus.TRIAL_PRODUCE.toString()
+                                );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -474,7 +540,15 @@ public class MainActivity extends AppCompatActivity {
                                 equipmentService.switchEquipmentStatus(
                                         preferences.getString("serial_no", ""),
                                         EquipmentStatus.REPAIR_MACHINE.ordinal(),
-                                        EquipmentStatus.REPAIR_MACHINE.toString());
+                                        EquipmentStatus.REPAIR_MACHINE.toString()
+                                );
+
+                                equipmentService.writingEquipmentStatusLog(
+                                        preferences.getString("serial_no", ""),
+                                        preferences.getString("name", ""),
+                                        EquipmentStatus.REPAIR_MACHINE.ordinal(),
+                                        EquipmentStatus.REPAIR_MACHINE.toString()
+                                );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -494,7 +568,15 @@ public class MainActivity extends AppCompatActivity {
                                 equipmentService.switchEquipmentStatus(
                                         preferences.getString("serial_no", ""),
                                         EquipmentStatus.MAINTENANCE.ordinal(),
-                                        EquipmentStatus.MAINTENANCE.toString());
+                                        EquipmentStatus.MAINTENANCE.toString()
+                                );
+
+                                equipmentService.writingEquipmentStatusLog(
+                                        preferences.getString("serial_no", ""),
+                                        preferences.getString("name", ""),
+                                        EquipmentStatus.MAINTENANCE.ordinal(),
+                                        EquipmentStatus.MAINTENANCE.toString()
+                                );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -514,7 +596,15 @@ public class MainActivity extends AppCompatActivity {
                                 equipmentService.switchEquipmentStatus(
                                         preferences.getString("serial_no", ""),
                                         EquipmentStatus.DEBUG_MACHINE.ordinal(),
-                                        EquipmentStatus.DEBUG_MACHINE.toString());
+                                        EquipmentStatus.DEBUG_MACHINE.toString()
+                                );
+
+                                equipmentService.writingEquipmentStatusLog(
+                                        preferences.getString("serial_no", ""),
+                                        preferences.getString("name", ""),
+                                        EquipmentStatus.DEBUG_MACHINE.ordinal(),
+                                        EquipmentStatus.DEBUG_MACHINE.toString()
+                                );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -527,23 +617,64 @@ public class MainActivity extends AppCompatActivity {
                 default:
                     break;
             }
+
+            // 更新状态
+            new Thread(statusUpdateTask).start();
         }
     };
 
-    /*
-    Handler handler = new Handler() {
+    private Runnable statusUpdateTask = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                // handler.postDelayed(this, 1000);
+
+                Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                        .getEquipmentStatus(preferences.getString("serial_no", ""));
+
+                String value = String.format(
+                        EQUIPMENT_STATUS_TEXT_TEMPLATE,
+                        equipmentStatus.get("equipment_name"),
+                        equipmentStatus.get("status_desc"),
+                        equipmentStatus.get("timestamp")
+                );
+                Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
+
+                Message msg = new Message();
+                msg.what = STATUS_UPDATE_HANDLE;
+                Bundle data = new Bundle();
+                data.putString("text", value);
+                // data.putSerializable("data", "");
+                msg.setData(data);
+                handler.sendMessage(msg);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    };
+
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            Bundle data = msg.getData();
-            String val = data.getString("data");
-            // getIntent().getSerializableExtra("data");
-            Log.i("mylog", "请求结果为：" + val);
 
-            // TODO UI界面的更新等相关操作
+            switch (msg.what) {
+                case STATUS_UPDATE_HANDLE:
+                    Bundle data = msg.getData();
+                    String val = data.getString("text");
+                    // getIntent().getSerializableExtra("data");
+
+                    Log.i(TAG, "请求结果为：" + val);
+
+                    // UI界面的更新等相关操作
+                    mEquipmentStatusTextView.setText(val);
+                    break;
+            }
+            super.handleMessage(msg);
         }
     };
-    */
 
     /**
      * 网络操作相关的子线程

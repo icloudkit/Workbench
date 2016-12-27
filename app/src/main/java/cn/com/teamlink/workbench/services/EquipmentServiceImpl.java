@@ -23,6 +23,8 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -76,9 +78,16 @@ public class EquipmentServiceImpl implements EquipmentService {
     */
 
     @Override
-    public Boolean switchEquipmentStatus(String serialNo, int status, String statsuDesc) {
+    public boolean switchEquipmentStatus(String serialNo, int status, String statsuDesc) {
         String sql = "UPDATE equipment_status SET status = ?, status_desc = ? WHERE serial_no = ?";
         int affectCount = DBUtil.execute(sql, status, statsuDesc, serialNo);
+        return ((affectCount > 0)? true : false);
+    }
+
+    @Override
+    public boolean writingEquipmentStatusLog(String serialNo, String equipmentName, int status, String statsuDesc) {
+        String sql = "INSERT INTO equipment_status_log (`serial_no`, `equipment_name`, `type`, `type_desc`, `status`, `status_desc`, `timestamp`) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        int affectCount = DBUtil.execute(sql, serialNo, equipmentName, 1, "", status, statsuDesc, new Timestamp(new Date().getTime()));
         return ((affectCount > 0)? true : false);
     }
 

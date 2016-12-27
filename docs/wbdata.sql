@@ -1,22 +1,22 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : localhost
-Source Server Version : 50709
-Source Host           : localhost:3306
+Source Server         : 127.0.0.1
+Source Server Version : 50634
+Source Host           : 127.0.0.1:3306
 Source Database       : wbdata
 
 Target Server Type    : MYSQL
-Target Server Version : 50709
+Target Server Version : 50634
 File Encoding         : 65001
 
-Date: 2016-12-26 23:45:04
+Date: 2016-12-27 21:27:18
 */
 
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------
--- Table structure for `enum_data`
+-- Table structure for enum_data
 -- ----------------------------
 DROP TABLE IF EXISTS `enum_data`;
 CREATE TABLE `enum_data` (
@@ -43,38 +43,68 @@ INSERT INTO `enum_data` VALUES ('8', '1', null, '7', '保养', '1');
 INSERT INTO `enum_data` VALUES ('9', '1', null, '8', '调机', '1');
 
 -- ----------------------------
--- Table structure for `mould`
+-- Table structure for equipment
 -- ----------------------------
-DROP TABLE IF EXISTS `mould`;
-CREATE TABLE `mould` (
+DROP TABLE IF EXISTS `equipment`;
+CREATE TABLE `equipment` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(60) DEFAULT NULL,
   `local_addr` varchar(30) DEFAULT NULL,
-  `serial_no` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  `serial_no` varchar(60) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_local_addr` (`local_addr`),
+  UNIQUE KEY `idx_serial_no` (`serial_no`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of mould
+-- Records of equipment
 -- ----------------------------
-INSERT INTO `mould` VALUES ('1', '192.168.0.105', '6b95cb3a-cb4e-11e6-952f-507b9db02f92');
-INSERT INTO `mould` VALUES ('2', '192.168.0.18', '6b95cb3a-cb4e-11e6-952f-507b9db02f92');
-INSERT INTO `mould` VALUES ('3', '192.168.1.169', '6b95cb3a-cb4e-11e6-952f-507b9db02f92');
-INSERT INTO `mould` VALUES ('4', '127.0.0.1', '6b95cb3a-cb4e-11e6-952f-507b9db02f92');
+INSERT INTO `equipment` VALUES ('1', 'MOULD1', '192.168.0.105', '6b95cb3a-cb4e-11e6-952f-507b9db02f92');
+INSERT INTO `equipment` VALUES ('2', 'MOULD2', '192.168.0.18', '6b95cb3a-cb4e-11e6-952f-507b9db02f93');
+INSERT INTO `equipment` VALUES ('3', 'MOULD3', '192.168.1.169', '6b95cb3a-cb4e-11e6-952f-507b9db02f94');
+INSERT INTO `equipment` VALUES ('4', 'MOULD4', '127.0.0.1', '6b95cb3a-cb4e-11e6-952f-507b9db02f95');
+INSERT INTO `equipment` VALUES ('5', 'MOULD5', '192.168.1.9', '6b95cb3a-cb4e-11e6-952f-507b9db02f96');
 
 -- ----------------------------
--- Table structure for `switch_status`
+-- Table structure for equipment_status
 -- ----------------------------
-DROP TABLE IF EXISTS `switch_status`;
-CREATE TABLE `switch_status` (
+DROP TABLE IF EXISTS `equipment_status`;
+CREATE TABLE `equipment_status` (
   `id` int(20) NOT NULL AUTO_INCREMENT,
+  `serial_no` varchar(60) DEFAULT NULL,
+  `equipment_name` varchar(60) DEFAULT NULL,
   `type` tinyint(3) DEFAULT NULL,
   `type_desc` varchar(30) DEFAULT NULL,
   `status` tinyint(3) DEFAULT NULL,
   `status_desc` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+  `timestamp` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_serial_no_status` (`status`,`serial_no`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Records of switch_status
+-- Records of equipment_status
 -- ----------------------------
-INSERT INTO `switch_status` VALUES ('1', '1', null, '1', null);
+INSERT INTO `equipment_status` VALUES ('1', '6b95cb3a-cb4e-11e6-952f-507b9db02f96', 'MOULD1', '1', '类型1', '3', '待料', '2016-12-27 20:32:47');
+INSERT INTO `equipment_status` VALUES ('4', '6b95cb3a-cb4e-11e6-952f-507b9db02f94', 'MOULD1', '1', '类型1', '3', '待料', '2016-12-27 17:16:40');
+
+-- ----------------------------
+-- Table structure for equipment_status_log
+-- ----------------------------
+DROP TABLE IF EXISTS `equipment_status_log`;
+CREATE TABLE `equipment_status_log` (
+  `id` int(20) NOT NULL AUTO_INCREMENT,
+  `serial_no` varchar(60) DEFAULT NULL,
+  `equipment_name` varchar(60) DEFAULT NULL,
+  `type` tinyint(3) DEFAULT NULL,
+  `type_desc` varchar(30) DEFAULT NULL,
+  `status` tinyint(3) DEFAULT NULL,
+  `status_desc` varchar(20) DEFAULT NULL,
+  `timestamp` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_serial_no_status` (`status`,`serial_no`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of equipment_status_log
+-- ----------------------------
