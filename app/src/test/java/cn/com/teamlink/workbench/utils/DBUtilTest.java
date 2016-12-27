@@ -34,6 +34,10 @@ public class DBUtilTest {
     public void query() throws Exception {
         List<Map<String, Object>> results = DBUtil.query("SELECT count(*) as row_count FROM enum_data");
         System.out.println(results.get(0).get("row_count"));
+
+        String str = "<action type=\"%1$s\">%2$s</action>";
+        String value = String.format(str,"_message_","error");
+        System.out.println(value);
     }
 
 }

@@ -17,10 +17,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    // This is important, it will run lint checks but won't abort build
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
     compile 'mysql:mysql-connector-java:5.1.30'
+    compile 'com.mcxiaoke.volley:library:1.0.19'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

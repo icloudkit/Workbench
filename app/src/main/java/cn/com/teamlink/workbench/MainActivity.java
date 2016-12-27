@@ -21,6 +21,7 @@ import android.content.pm.ActivityInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -29,18 +30,35 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.Volley;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import cn.com.teamlink.workbench.services.EquipmentService;
 import cn.com.teamlink.workbench.services.EquipmentServiceImpl;
 import cn.com.teamlink.workbench.services.EquipmentStatus;
+import cn.com.teamlink.workbench.utils.InputStreamVolleyRequest;
 
 /**
  * MainActivity.java
@@ -53,7 +71,10 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String SHARED_PREFERENCES_NAME = "settings";
 
+    private static final String EQUIPMENT_STATUS_TEXT_TEMPLATE = "当前机台：%1$s 当前状态：%2$s，开始时间：%3$s";
+
     private SharedPreferences preferences;
+    private InputStreamVolleyRequest request = null;
 
     private EquipmentService equipmentService = null;
     private Toolbar mToolbar;
@@ -67,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             mRepairMachineButton,
             mMaintenanceButton,
             mDebugMachineButton;
+    private TextView mEquipmentStatusTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +113,82 @@ public class MainActivity extends AppCompatActivity {
         equipmentService = new EquipmentServiceImpl();
         // 开启一个子线程，进行网络操作，等待有返回结果，使用handler通知UI
         new Thread(networkTask).start();
+
+        request = new InputStreamVolleyRequest(Request.Method.GET, "http://archiving.oss-cn-shenzhen.aliyuncs.com/archives/766350979/2016/12/26/766350979E1201606250938516995/PDF/00000001.pdf?Expires=1482845185&OSSAccessKeyId=TMP.AQF-SHbVPp01OeqWo7mjKGirAWQYjZQKfwMxcXo7bRao4b6qRY4nnYU5iC-mADAtAhUA2sy_1WMqZ9jTF52jm3xbf7c3LqgCFCTDng8mE9vbGZz6oKAHlvhG6Li2&Signature=gXGufcNKmMY20sXC%2B1Rb%2FdxqcWs%3D", new Response.Listener<byte[]>() {
+            @Override
+            public void onResponse(byte[] bytes) {
+                HashMap<String, Object> map = new HashMap<String, Object>();
+                try {
+                    if (bytes != null) {
+
+                        // Read file name from headers (We have configured API to send file name in "Content-Disposition" header in following format: "File-Name:File-Format" example "MyDoc:pdf"
+                        String content = request.responseHeaders.get("Content-Disposition");
+                        StringTokenizer st = new StringTokenizer(content, "=");
+
+                        int numberOfTokens = st.countTokens();
+                        String[] arrTag = new String[numberOfTokens];
+                        int x = 0;
+                        while (st.hasMoreTokens()) {
+                            arrTag[x] = st.nextToken();
+                        }
+
+                        String filename = arrTag[1];
+                        filename = filename.replace(":", ".");
+                        Log.d("DEBUG::FILE NAME", filename);
+
+                        InputStream input = null;
+                        BufferedOutputStream output = null;
+                        try {
+                            long lenghtOfFile = bytes.length;
+
+                            //covert reponse to input stream
+                            input = new ByteArrayInputStream(bytes);
+
+                            //Create a file on desired path and write stream data to it
+                            File path = Environment.getExternalStorageDirectory();
+                            File file = new File(path, filename);
+                            map.put("resume_path", file.toString());
+
+                            output = new BufferedOutputStream(new FileOutputStream(file));
+                            byte data[] = new byte[1024];
+
+                            int count = 0;
+                            long total = 0;
+
+                            while ((count = input.read(data)) != -1) {
+                                total += count;
+                                output.write(data, 0, count);
+                            }
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } finally {
+                            if (output != null) {
+                                output.flush();
+                            }
+                            if (output != null) {
+                                output.close();
+                            }
+                            if (output != null) {
+                                input.close();
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+
+            }
+        }, null);
+        RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
+        mRequestQueue.add(request);
+
     }
 
     @Override
@@ -100,11 +198,26 @@ public class MainActivity extends AppCompatActivity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
 
+        mEquipmentStatusTextView.setText("");
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
-                        .getEquipmentStatus(preferences.getString("serial_no", ""));
+                try {
+                    Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                            .getEquipmentStatus(preferences.getString("serial_no", ""));
+
+                    String value = String.format(
+                            EQUIPMENT_STATUS_TEXT_TEMPLATE,
+                            equipmentStatus.get("status_desc"),
+                            equipmentStatus.get("timestamp")
+                    );
+                    Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
+                    mEquipmentStatusTextView.setText(value);
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                }
 
             }
         }).start();
@@ -179,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
         mMaintenanceButton.setOnClickListener(mOnClickListener);
         mDebugMachineButton = (Button) findViewById(R.id.debug_machine_button);
         mDebugMachineButton.setOnClickListener(mOnClickListener);
+        mEquipmentStatusTextView = (TextView) findViewById(R.id.equipment_status_text_view);
     }
 
     // 获取本机WIFI
@@ -244,20 +358,43 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.wait_start_button:
                     // Toast.makeText(getApplicationContext(), "wait_start_button", Toast.LENGTH_SHORT).show();
 
-                    // 切换状态
-                    equipmentService.switchEquipmentStatus(
-                            preferences.getString("serial_no", ""),
-                            EquipmentStatus.WAIT_START.ordinal(),
-                            EquipmentStatus.WAIT_START.toString());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // 切换状态
+                                equipmentService.switchEquipmentStatus(
+                                        preferences.getString("serial_no", ""),
+                                        EquipmentStatus.WAIT_START.ordinal(),
+                                        EquipmentStatus.WAIT_START.toString());
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
                     break;
                 case R.id.wait_material_button:
                     // Toast.makeText(getApplicationContext(), "wait_material_button", Toast.LENGTH_SHORT).show();
 
-                    // 切换状态
-                    equipmentService.switchEquipmentStatus(
-                            preferences.getString("serial_no", ""),
-                            EquipmentStatus.WAIT_MATERIAL.ordinal(),
-                            EquipmentStatus.WAIT_MATERIAL.toString());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // 切换状态
+                                equipmentService.switchEquipmentStatus(
+                                        preferences.getString("serial_no", ""),
+                                        EquipmentStatus.WAIT_MATERIAL.ordinal(),
+                                        EquipmentStatus.WAIT_MATERIAL.toString());
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
+
                     break;
                 case R.id.replaced_mould_button:
                     // Toast.makeText(getApplicationContext(), "replaced_mould_button", Toast.LENGTH_SHORT).show();
@@ -266,56 +403,126 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.fix_mould_button:
                     // Toast.makeText(getApplicationContext(), "fix_mould_button", Toast.LENGTH_SHORT).show();
 
-                    // 切换状态
-                    equipmentService.switchEquipmentStatus(
-                            preferences.getString("serial_no", ""),
-                            EquipmentStatus.FIX_MOULD.ordinal(),
-                            EquipmentStatus.FIX_MOULD.toString());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // 切换状态
+                                equipmentService.switchEquipmentStatus(
+                                        preferences.getString("serial_no", ""),
+                                        EquipmentStatus.FIX_MOULD.ordinal(),
+                                        EquipmentStatus.FIX_MOULD.toString());
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
+
                     break;
                 case R.id.produce_button:
                     // Toast.makeText(getApplicationContext(), "produce_button", Toast.LENGTH_SHORT).show();
 
-                    // 切换状态
-                    equipmentService.switchEquipmentStatus(
-                            preferences.getString("serial_no", ""),
-                            EquipmentStatus.PRODUCE.ordinal(),
-                            EquipmentStatus.PRODUCE.toString());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // 切换状态
+                                equipmentService.switchEquipmentStatus(
+                                        preferences.getString("serial_no", ""),
+                                        EquipmentStatus.PRODUCE.ordinal(),
+                                        EquipmentStatus.PRODUCE.toString());
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
+
                     break;
                 case R.id.trial_produce_button:
                     // Toast.makeText(getApplicationContext(), "trial_produce_button", Toast.LENGTH_SHORT).show();
 
-                    // 切换状态
-                    equipmentService.switchEquipmentStatus(
-                            preferences.getString("serial_no", ""),
-                            EquipmentStatus.TRIAL_PRODUCE.ordinal(),
-                            EquipmentStatus.TRIAL_PRODUCE.toString());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // 切换状态
+                                equipmentService.switchEquipmentStatus(
+                                        preferences.getString("serial_no", ""),
+                                        EquipmentStatus.TRIAL_PRODUCE.ordinal(),
+                                        EquipmentStatus.TRIAL_PRODUCE.toString());
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
+
                     break;
                 case R.id.repair_machine_button:
                     // Toast.makeText(getApplicationContext(), "repair_machine_button", Toast.LENGTH_SHORT).show();
 
-                    // 切换状态
-                    equipmentService.switchEquipmentStatus(
-                            preferences.getString("serial_no", ""),
-                            EquipmentStatus.REPAIR_MACHINE.ordinal(),
-                            EquipmentStatus.REPAIR_MACHINE.toString());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // 切换状态
+                                equipmentService.switchEquipmentStatus(
+                                        preferences.getString("serial_no", ""),
+                                        EquipmentStatus.REPAIR_MACHINE.ordinal(),
+                                        EquipmentStatus.REPAIR_MACHINE.toString());
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+
                     break;
                 case R.id.maintenance_button:
                     // Toast.makeText(getApplicationContext(), "maintenance_button", Toast.LENGTH_SHORT).show();
 
-                    // 切换状态
-                    equipmentService.switchEquipmentStatus(
-                            preferences.getString("serial_no", ""),
-                            EquipmentStatus.MAINTENANCE.ordinal(),
-                            EquipmentStatus.MAINTENANCE.toString());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // 切换状态
+                                equipmentService.switchEquipmentStatus(
+                                        preferences.getString("serial_no", ""),
+                                        EquipmentStatus.MAINTENANCE.ordinal(),
+                                        EquipmentStatus.MAINTENANCE.toString());
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+
                     break;
                 case R.id.debug_machine_button:
                     // Toast.makeText(getApplicationContext(), "debug_machine_button", Toast.LENGTH_SHORT).show();
 
-                    // 切换状态
-                    equipmentService.switchEquipmentStatus(
-                            preferences.getString("serial_no", ""),
-                            EquipmentStatus.DEBUG_MACHINE.ordinal(),
-                            EquipmentStatus.DEBUG_MACHINE.toString());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                // 切换状态
+                                equipmentService.switchEquipmentStatus(
+                                        preferences.getString("serial_no", ""),
+                                        EquipmentStatus.DEBUG_MACHINE.ordinal(),
+                                        EquipmentStatus.DEBUG_MACHINE.toString());
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
+
                     break;
                 default:
                     break;

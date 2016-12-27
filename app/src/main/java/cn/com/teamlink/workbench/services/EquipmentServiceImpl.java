@@ -84,7 +84,7 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public Map<String, Object> getEquipmentStatus(String serialNo) {
-        String sql = "SELECT equipment_name, type, type_desc, status, status_desc FROM equipment_status WHERE serial_no = ?";
+        String sql = "SELECT equipment_name, type, type_desc, status, status_desc, timestamp FROM equipment_status WHERE serial_no = ?";
         List<Map<String, Object>> results = DBUtil.query(sql, serialNo);
         if(results.size() > 0) {
             return results.get(0);
