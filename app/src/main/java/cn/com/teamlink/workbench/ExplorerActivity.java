@@ -63,7 +63,7 @@ public class ExplorerActivity extends AppCompatActivity {
     // 适配器
     protected SimpleAdapter saTable;
 
-    private InputStreamVolleyRequest request = null;
+    private InputStreamVolleyRequest request;
 
 
     public void onCreate(Bundle savedInstanceState) {
@@ -109,8 +109,7 @@ public class ExplorerActivity extends AppCompatActivity {
         }
     }
 
-    // 表格单击处理
-    class ItemClickListener implements AdapterView.OnItemClickListener {
+    private class ItemClickListener implements AdapterView.OnItemClickListener {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

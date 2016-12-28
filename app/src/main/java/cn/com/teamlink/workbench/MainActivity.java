@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences preferences;
 
-    private EquipmentService equipmentService = null;
+    private EquipmentService equipmentService;
 
     private Toolbar mToolbar;
     private Button mScheduledDowntimeButton,
