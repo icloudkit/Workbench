@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final String SHARED_PREFERENCES_NAME = "settings";
 
-    private static final String EQUIPMENT_STATUS_TEXT_TEMPLATE = "当前机台：%1$s 当前状态：%2$s，开始时间：%3$s";
+    private static final String EQUIPMENT_STATUS_TEXT_TEMPLATE = "当前机台：%1$s 当前状态：正在%2$s，开始时间：%3$s";
 
     private static final int STATUS_UPDATE_HANDLE = 0;
 
