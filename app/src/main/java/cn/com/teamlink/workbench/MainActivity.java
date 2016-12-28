@@ -20,10 +20,12 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -78,9 +80,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int STATUS_UPDATE_HANDLE = 0;
 
     private SharedPreferences preferences;
-    private InputStreamVolleyRequest request = null;
 
     private EquipmentService equipmentService = null;
+
     private Toolbar mToolbar;
     private Button mScheduledDowntimeButton,
             mWaitStartButton,
@@ -101,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         // requestWindowFeature(Window.FEATURE_NO_TITLE);
         // 设置全屏
         // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
         // view.setKeepScreenOn(true)
 
@@ -117,99 +120,6 @@ public class MainActivity extends AppCompatActivity {
         equipmentService = new EquipmentServiceImpl();
         // 开启一个子线程，进行网络操作，等待有返回结果，使用handler通知UI
         new Thread(networkTask).start();
-
-        request = new InputStreamVolleyRequest(Request.Method.GET, "http://www.guanmaoyun.com/main.html", new Response.Listener<byte[]>() {
-            @Override
-            public void onResponse(byte[] bytes) {
-                HashMap<String, Object> map = new HashMap<String, Object>();
-                try {
-                    if (bytes != null) {
-
-                        // Read file name from headers (We have configured API to send file name in "Content-Disposition" header in following format: "File-Name:File-Format" example "MyDoc:pdf"
-                        String content = request.responseHeaders.get("Content-Disposition");
-                        /*
-                        StringTokenizer st = new StringTokenizer(content, "=");
-
-                        int numberOfTokens = st.countTokens();
-                        String[] arrTag = new String[numberOfTokens];
-                        int x = 0;
-                        while (st.hasMoreTokens()) {
-                            arrTag[x] = st.nextToken();
-                        }
-
-                        String filename = arrTag[1];
-                        */
-
-                        String filename = "test.html";
-                        // filename = filename.replace(":", ".");
-                        Log.i("DEBUG::FILE NAME", filename);
-
-                        InputStream input = null;
-                        BufferedOutputStream output = null;
-                        try {
-                            long lenghtOfFile = bytes.length;
-
-                            //covert reponse to input stream
-                            input = new ByteArrayInputStream(bytes);
-
-                            //Create a file on desired path and write stream data to it
-                            // File path = Environment.getExternalStorageDirectory();
-                            // File sd = Environment.getExternalStorageDirectory();
-                            // sd.canWrite();
-
-                            // File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                            // File path = Environment.getDownloadCacheDirectory();
-                            File path = Environment.getDataDirectory();
-                            Log.i("DEBUG::DataDirectory:", Environment.getDataDirectory().getAbsolutePath());
-                            // new java.io.File((getActivity().getApplicationContext().getFileStreamPath("FileName.xml").getPath()));
-                            // org.apache.commons.io.FileUtils.copyInputStreamToFile(is, file);
-                            Log.i("DEBUG::FILE PATH", path.getAbsolutePath());
-
-                            File file = new File(path, filename);
-                            map.put("resume_path", file.toString());
-
-                            Log.i("DEBUG::FILE PATH", file.getAbsolutePath());
-
-                            output = new BufferedOutputStream(new FileOutputStream(file));
-                            byte data[] = new byte[1024];
-
-                            int count = 0;
-                            long total = 0;
-
-                            while ((count = input.read(data)) != -1) {
-                                total += count;
-                                output.write(data, 0, count);
-                            }
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        } finally {
-                            if (output != null) {
-                                output.flush();
-                            }
-                            if (output != null) {
-                                output.close();
-                            }
-                            if (output != null) {
-                                input.close();
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-
-            }
-        }, null);
-        RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
-        mRequestQueue.add(request);
-
     }
 
     @Override
