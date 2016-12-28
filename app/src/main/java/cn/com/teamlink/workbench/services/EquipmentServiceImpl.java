@@ -79,14 +79,14 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public boolean switchEquipmentStatus(String serialNo, int status, String statsuDesc) {
-        String sql = "UPDATE equipment_status SET status = ?, status_desc = ? WHERE serial_no = ?";
-        int affectCount = DBUtil.execute(sql, status, statsuDesc, serialNo);
+        String sql = "UPDATE equipment_status SET status = ?, status_desc = ?, timestamp = ? WHERE serial_no = ?";
+        int affectCount = DBUtil.execute(sql, status, statsuDesc, new Timestamp(new Date().getTime()), serialNo);
         return ((affectCount > 0)? true : false);
     }
 
     @Override
     public boolean writingEquipmentStatusLog(String serialNo, String equipmentName, int status, String statsuDesc) {
-        String sql = "INSERT INTO equipment_status_log (`serial_no`, `equipment_name`, `type`, `type_desc`, `status`, `status_desc`, `timestamp`) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO equipment_status_log (serial_no, equipment_name, type, type_desc, status, status_desc, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?);";
         int affectCount = DBUtil.execute(sql, serialNo, equipmentName, 1, "", status, statsuDesc, new Timestamp(new Date().getTime()));
         return ((affectCount > 0)? true : false);
     }
@@ -100,5 +100,23 @@ public class EquipmentServiceImpl implements EquipmentService {
         } else {
             throw new RuntimeException("找不到设备相关配置！");
         }
+    }
+
+    @Override
+    public List<Map<String, Object>> getWorkOrder() {
+        String sql = "SELECT id, work_order_no, mould_no, part_code, part_name, cycle_time, plan_num FROM work_order";
+        List<Map<String, Object>> results = DBUtil.query(sql);
+        return results;
+    }
+
+    @Override
+    public boolean replacedMould(String serialNo, String workOrderNo, String mouldNo, String partCode, String partName) {
+        String sql = "UPDATE equipment_status SET work_order_no = ?, mould_no = ?, part_code = ?, part_name = ?, status = ?, status_desc = ?, timestamp = ? WHERE serial_no = ?";
+        int affectCount = DBUtil.execute(sql, workOrderNo, mouldNo, partCode, partName,
+                EquipmentStatus.REPLACED_MOULD.ordinal(), EquipmentStatus.REPLACED_MOULD.toString(),
+                new Timestamp(new Date().getTime()),
+                serialNo
+        );
+        return ((affectCount > 0)? true : false);
     }
 }

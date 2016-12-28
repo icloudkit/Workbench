@@ -34,6 +34,11 @@ public enum EquipmentStatus {
             return "生产";
         }
     },
+    REPLACED_MOULD {
+        public String toString() {
+            return "换模";
+        }
+    },
     WAIT_START {
         public String toString() {
             return "待人开机";

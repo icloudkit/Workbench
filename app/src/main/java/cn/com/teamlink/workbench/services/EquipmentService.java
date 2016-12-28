@@ -27,11 +27,60 @@ import java.util.Map;
  */
 public interface EquipmentService {
 
+    /**
+     * 获取设备编号
+     *
+     * @param localAddr
+     * @return
+     * @throws UnknownHostException
+     */
     Map<String, Object> getEquipmentSerialNumber(String localAddr) throws UnknownHostException;
 
+    /**
+     * 切换设备状态
+     *
+     * @param serialNo
+     * @param status
+     * @param statsuDesc
+     * @return
+     */
     boolean switchEquipmentStatus(String serialNo, int status, String statsuDesc);
 
+    /**
+     * 获取设备状态
+     *
+     * @param serialNo
+     * @return
+     */
     Map<String, Object> getEquipmentStatus(String serialNo);
 
+    /**
+     * 记录状态日志
+     *
+     * @param serialNo
+     * @param equipmentName
+     * @param status
+     * @param statsuDesc
+     * @return
+     */
     boolean writingEquipmentStatusLog(String serialNo, String equipmentName, int status, String statsuDesc);
+
+    /**
+     * 获取工单列表
+     *
+     * @return
+     */
+    List<Map<String, Object>> getWorkOrder();
+
+    /**
+     * 换模
+     *
+     * @param serialNo
+     * @param workOrderNo
+     * @param mouldNo
+     * @param partCode
+     * @param partName
+     * @return
+     */
+    boolean replacedMould(String serialNo, String workOrderNo, String mouldNo, String partCode, String partName);
 }
