@@ -65,6 +65,10 @@ public class EquipmentServiceImplTest {
         new EquipmentServiceImpl().writingEquipmentStatusLog(
                 "6b95cb3a-cb4e-11e6-952f-507b9db02f92",
                 "MOULD1",
+                "",
+                "",
+                "",
+                "",
                 EquipmentStatus.DEBUG_MACHINE.ordinal(),
                 EquipmentStatus.DEBUG_MACHINE.toString()
         );

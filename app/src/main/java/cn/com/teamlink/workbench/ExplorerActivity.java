@@ -15,6 +15,7 @@
  */
 package cn.com.teamlink.workbench;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -40,6 +41,7 @@ import com.android.volley.toolbox.Volley;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,6 +98,33 @@ public class ExplorerActivity extends AppCompatActivity {
 
         // 添加数据测试
         addData();
+
+
+        try {
+            // 定义文件名
+            String fileName = "fileDemo.txt";
+            // 以私有模式创建文件
+            FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+            String text = "Some data";
+            // 写入数据
+            fos.write(text.getBytes());
+            // 将缓冲区剩余数据写入文件
+            fos.flush();
+            // 关闭FileOutputStream
+            fos.close();
+
+            /*
+            String fileName = "fileDemo.txt";
+            FileInputStream fis = openFileInput(fileName);
+            byte[] readBytes = new byte[fis.available()];
+            while (fis.read(readBytes) != -1) {
+
+            }
+            */
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -160,11 +189,12 @@ public class ExplorerActivity extends AppCompatActivity {
 
                                 Log.d(TAG, "检验sdcard是否可用?");
                                 //判断sdcard是否存在?
-                                if(!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+                                if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                                     Log.d(TAG, "sdcard不可用!");
                                     Toast.makeText(getApplicationContext(), "没有找到SDCard!", Toast.LENGTH_LONG);
-                                    return ;
-                                };
+                                    return;
+                                }
+                                ;
 
                                 // File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                                 // File path = Environment.getDownloadCacheDirectory();
@@ -184,7 +214,7 @@ public class ExplorerActivity extends AppCompatActivity {
                                     blockSize = statFs.getBlockSize();
                                     blockCount = statFs.getBlockCount();
                                 }
-                                long sdCardSize = blockSize*blockCount;
+                                long sdCardSize = blockSize * blockCount;
                                 Log.d(TAG, String.valueOf(sdCardSize));
 
                                 // new java.io.File((getActivity().getApplicationContext().getFileStreamPath("FileName.xml").getPath()));

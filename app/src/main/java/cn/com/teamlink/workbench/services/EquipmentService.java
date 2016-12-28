@@ -63,7 +63,7 @@ public interface EquipmentService {
      * @param statsuDesc
      * @return
      */
-    boolean writingEquipmentStatusLog(String serialNo, String equipmentName, int status, String statsuDesc);
+    public boolean writingEquipmentStatusLog(String serialNo, String equipmentName, String workOrderNo, String mouldNo, String partCode, String partName, int status, String statsuDesc);
 
     /**
      * 获取工单列表

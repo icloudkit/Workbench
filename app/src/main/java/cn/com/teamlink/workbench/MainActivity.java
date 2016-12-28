@@ -20,12 +20,9 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.os.StatFs;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -44,19 +41,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.HurlStack;
-import com.android.volley.toolbox.Volley;
-
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -66,12 +50,10 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import cn.com.teamlink.workbench.services.EquipmentService;
 import cn.com.teamlink.workbench.services.EquipmentServiceImpl;
 import cn.com.teamlink.workbench.services.EquipmentStatus;
-import cn.com.teamlink.workbench.utils.InputStreamVolleyRequest;
 
 /**
  * MainActivity.java
@@ -135,8 +117,6 @@ public class MainActivity extends AppCompatActivity {
         equipmentService = new EquipmentServiceImpl();
         // 开启一个子线程，进行网络操作，等待有返回结果，使用handler通知UI
         new Thread(networkTask).start();
-
-
     }
 
     @Override
@@ -222,23 +202,24 @@ public class MainActivity extends AppCompatActivity {
         mDebugMachineButton.setOnClickListener(mOnClickListener);
         mEquipmentStatusTextView = (TextView) findViewById(R.id.equipment_status_text_view);
 
-        // FIXME PopupWindow
-        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-        // 引入窗口配置文件
-        View view = inflater.inflate(R.layout.layout_popup_menu, null);
-        // 创建PopupWindow对象 ViewGroup.LayoutParams.WRAP_CONTENT
-        popupWindow = new PopupWindow(view, 1200, 600, false);
-        // 需要设置一下此参数，点击外边可消失
-        // new ColorDrawable(0) getResources().getDrawable(R.drawable.popup_window_background)
-        // popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.menu_dropdown_panel_pi));
-        // 设置点击窗口外边窗口消失
-        popupWindow.setOutsideTouchable(true);
-        // 设置此参数获得焦点，否则无法点击
-        popupWindow.setFocusable(true);
-        // 设置动画样式
-        // popupWindow.setAnimationStyle(R.style.PopupAnimation);
-        // 设置窗口消失事件
-        // popupWindow.setOnDismissListenerd(new PopupWindow.OnDismissListener(){});
+        try {
+            // FIXME PopupWindow
+            LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+            // 引入窗口配置文件
+            View view = inflater.inflate(R.layout.layout_popup_menu, null);
+            // 创建PopupWindow对象 ViewGroup.LayoutParams.WRAP_CONTENT
+            popupWindow = new PopupWindow(view, 1200, 600, false);
+            // 需要设置一下此参数，点击外边可消失
+            // new ColorDrawable(0) getResources().getDrawable(R.drawable.popup_window_background)
+            // popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.menu_dropdown_panel_pi));
+            // 设置点击窗口外边窗口消失
+            popupWindow.setOutsideTouchable(true);
+            // 设置此参数获得焦点，否则无法点击
+            popupWindow.setFocusable(true);
+            // 设置动画样式
+            // popupWindow.setAnimationStyle(R.style.PopupAnimation);
+            // 设置窗口消失事件
+            // popupWindow.setOnDismissListenerd(new PopupWindow.OnDismissListener(){});
         /*
         // 点击PopupWindow区域外部,PopupWindow消失
         popupWindow.setTouchInterceptor(new View.OnTouchListener() {
@@ -253,51 +234,58 @@ public class MainActivity extends AppCompatActivity {
         });
         */
 
-        ListView mPopupMenuListView = (ListView) view.findViewById(R.id.main_popup_menu_list_view);
-        mPopupMenuListView.setFastScrollAlwaysVisible(true);
-        mPopupMenuListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                try {
-                    Map<String, Object> item = mPopupWindowListItem.get(position);
-                    final String workOrderNo = String.valueOf(item.get("work_order_no"));
-                    final String mouldNo = String.valueOf(item.get("mould_no"));
-                    final String partCode = String.valueOf(item.get("part_code"));
-                    final String partName = String.valueOf(item.get("part_name"));
-                    // final String cycleTime = String.valueOf(item.get("cycle_time"));
-                    // final String planNum = String.valueOf(item.get("plan_num"));
+            ListView mPopupMenuListView = (ListView) view.findViewById(R.id.main_popup_menu_list_view);
+            mPopupMenuListView.setFastScrollAlwaysVisible(true);
+            mPopupMenuListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    try {
+                        Map<String, Object> item = mPopupWindowListItem.get(position);
+                        final String workOrderNo = String.valueOf(item.get("work_order_no"));
+                        final String mouldNo = String.valueOf(item.get("mould_no"));
+                        final String partCode = String.valueOf(item.get("part_code"));
+                        final String partName = String.valueOf(item.get("part_name"));
+                        // final String cycleTime = String.valueOf(item.get("cycle_time"));
+                        // final String planNum = String.valueOf(item.get("plan_num"));
 
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            equipmentService.replacedMould(
-                                    preferences.getString("serial_no", ""),
-                                    workOrderNo,
-                                    mouldNo,
-                                    partCode,
-                                    partName
-                            );
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                equipmentService.replacedMould(
+                                        preferences.getString("serial_no", ""),
+                                        workOrderNo,
+                                        mouldNo,
+                                        partCode,
+                                        partName
+                                );
 
-                            equipmentService.writingEquipmentStatusLog(
-                                    preferences.getString("serial_no", ""),
-                                    preferences.getString("name", ""),
-                                    EquipmentStatus.REPLACED_MOULD.ordinal(),
-                                    EquipmentStatus.REPLACED_MOULD.toString()
-                            );
+                                equipmentService.writingEquipmentStatusLog(
+                                        preferences.getString("serial_no", ""),
+                                        preferences.getString("name", ""),
+                                        workOrderNo,
+                                        mouldNo,
+                                        partCode,
+                                        partName,
+                                        EquipmentStatus.REPLACED_MOULD.ordinal(),
+                                        EquipmentStatus.REPLACED_MOULD.toString()
+                                );
 
-                            // 更新状态
-                            new Thread(statusUpdateTask).start();
+                                // 更新状态
+                                new Thread(statusUpdateTask).start();
 
-                            Snackbar.make(mToolbar, "换模成功！", Snackbar.LENGTH_SHORT).show();
-                        }
-                    });
-                } catch (Exception e) {
-                    Snackbar.make(mToolbar, "换模失败！", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(mToolbar, "换模成功！", Snackbar.LENGTH_SHORT).show();
+                            }
+                        });
+                    } catch (Exception e) {
+                        Snackbar.make(mToolbar, "换模失败！", Snackbar.LENGTH_SHORT).show();
+                    }
+                    popupWindow.dismiss();
                 }
-                popupWindow.dismiss();
-            }
-        });
-        mPopupMenuListView.setAdapter(mSimpleAdapter);
+            });
+            mPopupMenuListView.setAdapter(mSimpleAdapter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // 获取本机WIFI
@@ -307,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
         // 获取32位整型IP地址
         int ipAddress = wifiInfo.getIpAddress();
 
-        //返回整型地址转换成“*.*.*.*”地址
+        // 返回整型地址转换成“*.*.*.*”地址
         return String.format("%d.%d.%d.%d",
                 (ipAddress & 0xff), (ipAddress >> 8 & 0xff),
                 (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
@@ -338,16 +326,18 @@ public class MainActivity extends AppCompatActivity {
         public boolean onMenuItemClick(MenuItem menuItem) {
             switch (menuItem.getItemId()) {
                 /*
-                //因为使用android.support.v7.widget.SearchView类，可以在onCreateOptionsMenu(Menu menu)中直接设置监听事件
+                // 因为使用android.support.v7.widget.SearchView类，可以在onCreateOptionsMenu(Menu menu)中直接设置监听事件
                 case R.id.action_search:
                     Snackbar.make(mToolbar, "Click Search", Snackbar.LENGTH_SHORT).show();
                     break;
                 */
                 case R.id.action_share:
-                    Snackbar.make(mToolbar, "Click Share", Snackbar.LENGTH_SHORT).show();
+                    // TODO
+                    // Snackbar.make(mToolbar, "Click Share", Snackbar.LENGTH_SHORT).show();
                     break;
                 case R.id.action_more:
-                    Snackbar.make(mToolbar, "Click More", Snackbar.LENGTH_SHORT).show();
+                    // TODO
+                    // Snackbar.make(mToolbar, "Click More", Snackbar.LENGTH_SHORT).show();
                     break;
             }
             return true;
@@ -371,9 +361,17 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.STOPED.toString()
                                 );
 
+                                Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                                        .getEquipmentStatus(preferences.getString("serial_no", ""));
+
+
                                 equipmentService.writingEquipmentStatusLog(
                                         preferences.getString("serial_no", ""),
                                         preferences.getString("name", ""),
+                                        String.valueOf(equipmentStatus.get("work_order_no")),
+                                        String.valueOf(equipmentStatus.get("mould_no")),
+                                        String.valueOf(equipmentStatus.get("part_code")),
+                                        String.valueOf(equipmentStatus.get("part_name")),
                                         EquipmentStatus.STOPED.ordinal(),
                                         EquipmentStatus.STOPED.toString()
                                 );
@@ -399,11 +397,19 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.WAIT_START.toString()
                                 );
 
+                                Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                                        .getEquipmentStatus(preferences.getString("serial_no", ""));
+
+
                                 equipmentService.writingEquipmentStatusLog(
                                         preferences.getString("serial_no", ""),
                                         preferences.getString("name", ""),
-                                        EquipmentStatus.WAIT_START.ordinal(),
-                                        EquipmentStatus.WAIT_START.toString()
+                                        String.valueOf(equipmentStatus.get("work_order_no")),
+                                        String.valueOf(equipmentStatus.get("mould_no")),
+                                        String.valueOf(equipmentStatus.get("part_code")),
+                                        String.valueOf(equipmentStatus.get("part_name")),
+                                        EquipmentStatus.STOPED.ordinal(),
+                                        EquipmentStatus.STOPED.toString()
                                 );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
@@ -427,11 +433,19 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.WAIT_MATERIAL.toString()
                                 );
 
+                                Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                                        .getEquipmentStatus(preferences.getString("serial_no", ""));
+
+
                                 equipmentService.writingEquipmentStatusLog(
                                         preferences.getString("serial_no", ""),
                                         preferences.getString("name", ""),
-                                        EquipmentStatus.WAIT_MATERIAL.ordinal(),
-                                        EquipmentStatus.WAIT_MATERIAL.toString()
+                                        String.valueOf(equipmentStatus.get("work_order_no")),
+                                        String.valueOf(equipmentStatus.get("mould_no")),
+                                        String.valueOf(equipmentStatus.get("part_code")),
+                                        String.valueOf(equipmentStatus.get("part_name")),
+                                        EquipmentStatus.STOPED.ordinal(),
+                                        EquipmentStatus.STOPED.toString()
                                 );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
@@ -449,11 +463,11 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             try {
-                                if(mPopupWindowListItem == null) {
+                                if (mPopupWindowListItem == null) {
                                     mPopupWindowListItem = new ArrayList<HashMap<String, Object>>();
 
                                     List<Map<String, Object>> workOrders = equipmentService.getWorkOrder();
-                                    for(Map<String, Object> workOrder : workOrders) {
+                                    for (Map<String, Object> workOrder : workOrders) {
                                         String id = String.valueOf(workOrder.get("id"));
                                         String workOrderNo = String.valueOf(workOrder.get("work_order_no"));
                                         String mouldNo = String.valueOf(workOrder.get("mould_no"));
@@ -501,11 +515,19 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.FIX_MOULD.toString()
                                 );
 
+                                Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                                        .getEquipmentStatus(preferences.getString("serial_no", ""));
+
+
                                 equipmentService.writingEquipmentStatusLog(
                                         preferences.getString("serial_no", ""),
                                         preferences.getString("name", ""),
-                                        EquipmentStatus.FIX_MOULD.ordinal(),
-                                        EquipmentStatus.FIX_MOULD.toString()
+                                        String.valueOf(equipmentStatus.get("work_order_no")),
+                                        String.valueOf(equipmentStatus.get("mould_no")),
+                                        String.valueOf(equipmentStatus.get("part_code")),
+                                        String.valueOf(equipmentStatus.get("part_name")),
+                                        EquipmentStatus.STOPED.ordinal(),
+                                        EquipmentStatus.STOPED.toString()
                                 );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
@@ -530,11 +552,19 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.PRODUCE.toString()
                                 );
 
+                                Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                                        .getEquipmentStatus(preferences.getString("serial_no", ""));
+
+
                                 equipmentService.writingEquipmentStatusLog(
                                         preferences.getString("serial_no", ""),
                                         preferences.getString("name", ""),
-                                        EquipmentStatus.PRODUCE.ordinal(),
-                                        EquipmentStatus.PRODUCE.toString()
+                                        String.valueOf(equipmentStatus.get("work_order_no")),
+                                        String.valueOf(equipmentStatus.get("mould_no")),
+                                        String.valueOf(equipmentStatus.get("part_code")),
+                                        String.valueOf(equipmentStatus.get("part_name")),
+                                        EquipmentStatus.STOPED.ordinal(),
+                                        EquipmentStatus.STOPED.toString()
                                 );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
@@ -559,11 +589,19 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.TRIAL_PRODUCE.toString()
                                 );
 
+                                Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                                        .getEquipmentStatus(preferences.getString("serial_no", ""));
+
+
                                 equipmentService.writingEquipmentStatusLog(
                                         preferences.getString("serial_no", ""),
                                         preferences.getString("name", ""),
-                                        EquipmentStatus.TRIAL_PRODUCE.ordinal(),
-                                        EquipmentStatus.TRIAL_PRODUCE.toString()
+                                        String.valueOf(equipmentStatus.get("work_order_no")),
+                                        String.valueOf(equipmentStatus.get("mould_no")),
+                                        String.valueOf(equipmentStatus.get("part_code")),
+                                        String.valueOf(equipmentStatus.get("part_name")),
+                                        EquipmentStatus.STOPED.ordinal(),
+                                        EquipmentStatus.STOPED.toString()
                                 );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
@@ -588,11 +626,19 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.REPAIR_MACHINE.toString()
                                 );
 
+                                Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                                        .getEquipmentStatus(preferences.getString("serial_no", ""));
+
+
                                 equipmentService.writingEquipmentStatusLog(
                                         preferences.getString("serial_no", ""),
                                         preferences.getString("name", ""),
-                                        EquipmentStatus.REPAIR_MACHINE.ordinal(),
-                                        EquipmentStatus.REPAIR_MACHINE.toString()
+                                        String.valueOf(equipmentStatus.get("work_order_no")),
+                                        String.valueOf(equipmentStatus.get("mould_no")),
+                                        String.valueOf(equipmentStatus.get("part_code")),
+                                        String.valueOf(equipmentStatus.get("part_name")),
+                                        EquipmentStatus.STOPED.ordinal(),
+                                        EquipmentStatus.STOPED.toString()
                                 );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
@@ -616,11 +662,19 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.MAINTENANCE.toString()
                                 );
 
+                                Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                                        .getEquipmentStatus(preferences.getString("serial_no", ""));
+
+
                                 equipmentService.writingEquipmentStatusLog(
                                         preferences.getString("serial_no", ""),
                                         preferences.getString("name", ""),
-                                        EquipmentStatus.MAINTENANCE.ordinal(),
-                                        EquipmentStatus.MAINTENANCE.toString()
+                                        String.valueOf(equipmentStatus.get("work_order_no")),
+                                        String.valueOf(equipmentStatus.get("mould_no")),
+                                        String.valueOf(equipmentStatus.get("part_code")),
+                                        String.valueOf(equipmentStatus.get("part_name")),
+                                        EquipmentStatus.STOPED.ordinal(),
+                                        EquipmentStatus.STOPED.toString()
                                 );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
@@ -644,11 +698,19 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.DEBUG_MACHINE.toString()
                                 );
 
+                                Map<String, Object> equipmentStatus = new EquipmentServiceImpl()
+                                        .getEquipmentStatus(preferences.getString("serial_no", ""));
+
+
                                 equipmentService.writingEquipmentStatusLog(
                                         preferences.getString("serial_no", ""),
                                         preferences.getString("name", ""),
-                                        EquipmentStatus.DEBUG_MACHINE.ordinal(),
-                                        EquipmentStatus.DEBUG_MACHINE.toString()
+                                        String.valueOf(equipmentStatus.get("work_order_no")),
+                                        String.valueOf(equipmentStatus.get("mould_no")),
+                                        String.valueOf(equipmentStatus.get("part_code")),
+                                        String.valueOf(equipmentStatus.get("part_name")),
+                                        EquipmentStatus.STOPED.ordinal(),
+                                        EquipmentStatus.STOPED.toString()
                                 );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
