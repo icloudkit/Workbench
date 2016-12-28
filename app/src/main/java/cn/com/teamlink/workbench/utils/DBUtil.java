@@ -54,9 +54,10 @@ public class DBUtil {
 
     // private static String url = "jdbc:mysql://127.0.0.1:3306/wbdata?useUnicode=true&characterEncoding=UTF-8";
     // private static String url = "jdbc:mysql://192.168.0.18:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&maxReconnects=10";
-    // private static String url = "jdbc:mysql://192.168.0.18:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
+    private static String url = "jdbc:mysql://192.168.0.18:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
     // private static String url = "jdbc:mysql://127.0.0.1:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
-    private static String url = "jdbc:mysql://192.168.1.169:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
+    // private static String url = "jdbc:mysql://192.168.1.169:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
+    // private static String url = "jdbc:mysql://192.168.1.102:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
     private static String username = "root";
     private static String password = "root";
     private static String driverName = "com.mysql.jdbc.Driver";

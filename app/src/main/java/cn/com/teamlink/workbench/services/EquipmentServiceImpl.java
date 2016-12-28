@@ -86,8 +86,8 @@ public class EquipmentServiceImpl implements EquipmentService {
 
     @Override
     public boolean writingEquipmentStatusLog(String serialNo, String equipmentName, String workOrderNo, String mouldNo, String partCode, String partName, int status, String statsuDesc) {
-        String sql = "INSERT INTO equipment_status_log (serial_no, equipment_name, type, type_desc, work_order_no, mould_no, part_code, part_name, status, status_desc, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?);";
-        int affectCount = DBUtil.execute(sql, serialNo, equipmentName, 1, "", status, statsuDesc, new Timestamp(new Date().getTime()));
+        String sql = "INSERT INTO equipment_status_log (serial_no, equipment_name, type, type_desc, work_order_no, mould_no, part_code, part_name, status, status_desc, timestamp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        int affectCount = DBUtil.execute(sql, serialNo, equipmentName, 1, "", workOrderNo, mouldNo, partCode, partName, status, statsuDesc, new Timestamp(new Date().getTime()));
         return ((affectCount > 0)? true : false);
     }
 
@@ -98,7 +98,7 @@ public class EquipmentServiceImpl implements EquipmentService {
         if(results.size() > 0) {
             return results.get(0);
         } else {
-            throw new RuntimeException("找不到设备相关配置！");
+            throw new RuntimeException("找不到设备相关状态配置！");
         }
     }
 

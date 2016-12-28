@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
             mDebugMachineButton;
     private TextView mEquipmentStatusTextView;
     private PopupWindow popupWindow;
+    private ListView mPopupMenuListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,14 +153,15 @@ public class MainActivity extends AppCompatActivity {
         // app logo
         // mToolbar.setLogo(R.mipmap.ic_launcher);
         // title
-        mToolbar.setTitle(R.string.switch_status);
+        mToolbar.setTitle("联机管理");
         // sub title
-        // mToolbar.setSubtitle(ToolBar subtitle");
+        mToolbar.setSubtitle(R.string.switch_status);
         // 以上3个属性必须在setSupportActionBar(mToolbar)之前调用
         setSupportActionBar(mToolbar);
 
         // 设置导航Icon，必须在setSupportActionBar(mToolbar)之后设置
         // mToolbar.setNavigationIcon(android.R.drawable.ic_menu_more);
+        mToolbar.setNavigationIcon(R.mipmap.ic_launcher);
         // 添加菜单点击事件
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,90 +204,89 @@ public class MainActivity extends AppCompatActivity {
         mDebugMachineButton.setOnClickListener(mOnClickListener);
         mEquipmentStatusTextView = (TextView) findViewById(R.id.equipment_status_text_view);
 
-        try {
-            // FIXME PopupWindow
-            LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-            // 引入窗口配置文件
-            View view = inflater.inflate(R.layout.layout_popup_menu, null);
-            // 创建PopupWindow对象 ViewGroup.LayoutParams.WRAP_CONTENT
-            popupWindow = new PopupWindow(view, 1200, 600, false);
-            // 需要设置一下此参数，点击外边可消失
-            // new ColorDrawable(0) getResources().getDrawable(R.drawable.popup_window_background)
-            // popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.menu_dropdown_panel_pi));
-            // 设置点击窗口外边窗口消失
-            popupWindow.setOutsideTouchable(true);
-            // 设置此参数获得焦点，否则无法点击
-            popupWindow.setFocusable(true);
-            // 设置动画样式
-            // popupWindow.setAnimationStyle(R.style.PopupAnimation);
-            // 设置窗口消失事件
-            // popupWindow.setOnDismissListenerd(new PopupWindow.OnDismissListener(){});
-        /*
-        // 点击PopupWindow区域外部,PopupWindow消失
-        popupWindow.setTouchInterceptor(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
-                    popupWindow.dismiss();
-                    return true;
-                }
-                return false;
-            }
-        });
-        */
-
-            ListView mPopupMenuListView = (ListView) view.findViewById(R.id.main_popup_menu_list_view);
-            mPopupMenuListView.setFastScrollAlwaysVisible(true);
-            mPopupMenuListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // FIXME PopupWindow
+        LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+        // 引入窗口配置文件
+        View view = inflater.inflate(R.layout.layout_popup_menu, null);
+        // 创建PopupWindow对象 ViewGroup.LayoutParams.WRAP_CONTENT
+        popupWindow = new PopupWindow(view, 1200, ViewGroup.LayoutParams.WRAP_CONTENT, false);
+        // 需要设置一下此参数，点击外边可消失
+        // new ColorDrawable(0) getResources().getDrawable(R.drawable.popup_window_background)
+        // popupWindow.setBackgroundDrawable(getResources().getDrawable(R.drawable.menu_dropdown_panel_pi));
+        // 设置点击窗口外边窗口消失
+        popupWindow.setOutsideTouchable(true);
+        // 设置此参数获得焦点，否则无法点击
+        popupWindow.setFocusable(true);
+        // 设置动画样式
+        // popupWindow.setAnimationStyle(R.style.PopupAnimation);
+        // 设置窗口消失事件
+        // popupWindow.setOnDismissListenerd(new PopupWindow.OnDismissListener(){});
+            /*
+            // 点击PopupWindow区域外部,PopupWindow消失
+            popupWindow.setTouchInterceptor(new View.OnTouchListener() {
                 @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    try {
-                        Map<String, Object> item = mPopupWindowListItem.get(position);
-                        final String workOrderNo = String.valueOf(item.get("work_order_no"));
-                        final String mouldNo = String.valueOf(item.get("mould_no"));
-                        final String partCode = String.valueOf(item.get("part_code"));
-                        final String partName = String.valueOf(item.get("part_name"));
-                        // final String cycleTime = String.valueOf(item.get("cycle_time"));
-                        // final String planNum = String.valueOf(item.get("plan_num"));
-
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                equipmentService.replacedMould(
-                                        preferences.getString("serial_no", ""),
-                                        workOrderNo,
-                                        mouldNo,
-                                        partCode,
-                                        partName
-                                );
-
-                                equipmentService.writingEquipmentStatusLog(
-                                        preferences.getString("serial_no", ""),
-                                        preferences.getString("name", ""),
-                                        workOrderNo,
-                                        mouldNo,
-                                        partCode,
-                                        partName,
-                                        EquipmentStatus.REPLACED_MOULD.ordinal(),
-                                        EquipmentStatus.REPLACED_MOULD.toString()
-                                );
-
-                                // 更新状态
-                                new Thread(statusUpdateTask).start();
-
-                                Snackbar.make(mToolbar, "换模成功！", Snackbar.LENGTH_SHORT).show();
-                            }
-                        });
-                    } catch (Exception e) {
-                        Snackbar.make(mToolbar, "换模失败！", Snackbar.LENGTH_SHORT).show();
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
+                        popupWindow.dismiss();
+                        return true;
                     }
-                    popupWindow.dismiss();
+                    return false;
                 }
             });
-            mPopupMenuListView.setAdapter(mSimpleAdapter);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            */
+
+        mPopupMenuListView = (ListView) view.findViewById(R.id.main_popup_menu_list_view);
+        mPopupMenuListView.setFastScrollAlwaysVisible(true);
+        mPopupMenuListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                try {
+                    Log.i(TAG, position + " " + id);
+                    Map<String, Object> item = mPopupWindowListItem.get(position);
+                    final String workOrderNo = String.valueOf(item.get("work_order_no"));
+                    final String mouldNo = String.valueOf(item.get("mould_no"));
+                    final String partCode = String.valueOf(item.get("part_code"));
+                    final String partName = String.valueOf(item.get("part_name"));
+                    // final String cycleTime = String.valueOf(item.get("cycle_time"));
+                    // final String planNum = String.valueOf(item.get("plan_num"));
+
+                    Log.i(TAG, workOrderNo + " " + mouldNo);
+                    Log.i(TAG, item.get("work_order_no") + " " + item.get("mould_no"));
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            equipmentService.replacedMould(
+                                    preferences.getString("serial_no", ""),
+                                    workOrderNo,
+                                    mouldNo,
+                                    partCode,
+                                    partName
+                            );
+
+                            equipmentService.writingEquipmentStatusLog(
+                                    preferences.getString("serial_no", ""),
+                                    preferences.getString("name", ""),
+                                    workOrderNo,
+                                    mouldNo,
+                                    partCode,
+                                    partName,
+                                    EquipmentStatus.REPLACED_MOULD.ordinal(),
+                                    EquipmentStatus.REPLACED_MOULD.toString()
+                            );
+
+                            // 更新状态
+                            new Thread(statusUpdateTask).start();
+
+                            Snackbar.make(mToolbar, "换模成功！", Snackbar.LENGTH_SHORT).show();
+                        }
+                    }).start();
+                } catch (Exception e) {
+                    Snackbar.make(mToolbar, "换模失败！", Snackbar.LENGTH_SHORT).show();
+                }
+                popupWindow.dismiss();
+            }
+        });
     }
 
     // 获取本机WIFI
@@ -375,11 +376,14 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.STOPED.ordinal(),
                                         EquipmentStatus.STOPED.toString()
                                 );
+
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
 
+                            // 更新状态
+                            new Thread(statusUpdateTask).start();
                         }
                     }).start();
                     break;
@@ -408,14 +412,16 @@ public class MainActivity extends AppCompatActivity {
                                         String.valueOf(equipmentStatus.get("mould_no")),
                                         String.valueOf(equipmentStatus.get("part_code")),
                                         String.valueOf(equipmentStatus.get("part_name")),
-                                        EquipmentStatus.STOPED.ordinal(),
-                                        EquipmentStatus.STOPED.toString()
+                                        EquipmentStatus.WAIT_START.ordinal(),
+                                        EquipmentStatus.WAIT_START.toString()
                                 );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
 
+                            // 更新状态
+                            new Thread(statusUpdateTask).start();
                         }
                     }).start();
                     break;
@@ -444,14 +450,16 @@ public class MainActivity extends AppCompatActivity {
                                         String.valueOf(equipmentStatus.get("mould_no")),
                                         String.valueOf(equipmentStatus.get("part_code")),
                                         String.valueOf(equipmentStatus.get("part_name")),
-                                        EquipmentStatus.STOPED.ordinal(),
-                                        EquipmentStatus.STOPED.toString()
+                                        EquipmentStatus.WAIT_MATERIAL.ordinal(),
+                                        EquipmentStatus.WAIT_MATERIAL.toString()
                                 );
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
 
+                            // 更新状态
+                            new Thread(statusUpdateTask).start();
                         }
                     }).start();
 
@@ -481,22 +489,63 @@ public class MainActivity extends AppCompatActivity {
                                                 "item_title",
                                                 new StringBuffer()
                                                         .append(workOrderNo)
-                                                        .append("（")
+                                                        .append(" ")
+                                                        .append("(")
                                                         .append(mouldNo).append("|")
                                                         .append(partCode).append("|")
-                                                        .append(partName).append("|")
-                                                        .append("）")
+                                                        .append(partName)
+                                                        .append(")")
                                         );
+                                        workOrderItem.put("work_order_no", workOrderNo);
+                                        workOrderItem.put("mould_no", mouldNo);
+                                        workOrderItem.put("part_code", partCode);
+                                        workOrderItem.put("part_name", partName);
                                         mPopupWindowListItem.add(workOrderItem);
-
-                                        Message msg = new Message();
-                                        msg.what = SHOW_POPUP_WINDOW_HANDLE;
-                                        handler.sendMessage(msg);
                                     }
+
+                                    mPopupMenuListView.setAdapter(
+                                            // BaseAdapter mSimpleAdapter =
+                                            // SimpleAdapter mSimpleAdapter = new SimpleAdapter(getApplicationContext(), mPopupWindowListItem, R.layout.main_popup_menu_item, new String[]{"item_icon", "item_title"}, new int[]{R.id.popup_menu_item_icon, R.id.popup_menu_item_title});
+                                            new BaseAdapter() {
+
+                                                @Override
+                                                public int getCount() {
+                                                    return mPopupWindowListItem.size();
+                                                }
+
+                                                @Override
+                                                public Object getItem(int i) {
+                                                    return null;
+                                                }
+
+                                                @Override
+                                                public long getItemId(int i) {
+                                                    return 0;
+                                                }
+
+                                                @Override
+                                                public View getView(int position, View convertView, ViewGroup parent) {
+
+                                                    if (convertView == null) {
+                                                        LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+                                                        convertView = inflater.inflate(R.layout.popup_menu_list_item, parent, false);
+                                                    }
+
+                                                    TextView popupMenuItemTitle = (TextView) convertView.findViewById(R.id.popup_menu_list_item_title);
+                                                    popupMenuItemTitle.setText(mPopupWindowListItem.get(position).get("item_title").toString());
+
+                                                    return convertView;
+                                                }
+                                            }
+                                    );
                                 }
+
+                                Message msg = new Message();
+                                msg.what = SHOW_POPUP_WINDOW_HANDLE;
+                                handler.sendMessage(msg);
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
-                                e.printStackTrace();
+                                Log.e(TAG, e.getLocalizedMessage(), e);
                             }
                         }
                     }).start();
@@ -534,6 +583,8 @@ public class MainActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
 
+                            // 更新状态
+                            new Thread(statusUpdateTask).start();
                         }
                     }).start();
 
@@ -571,6 +622,8 @@ public class MainActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
 
+                            // 更新状态
+                            new Thread(statusUpdateTask).start();
                         }
                     }).start();
 
@@ -608,6 +661,8 @@ public class MainActivity extends AppCompatActivity {
                                 e.printStackTrace();
                             }
 
+                            // 更新状态
+                            new Thread(statusUpdateTask).start();
                         }
                     }).start();
 
@@ -640,6 +695,9 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.STOPED.ordinal(),
                                         EquipmentStatus.STOPED.toString()
                                 );
+
+                                // 更新状态
+                                new Thread(statusUpdateTask).start();
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -676,6 +734,9 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.STOPED.ordinal(),
                                         EquipmentStatus.STOPED.toString()
                                 );
+
+                                // 更新状态
+                                new Thread(statusUpdateTask).start();
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -712,6 +773,9 @@ public class MainActivity extends AppCompatActivity {
                                         EquipmentStatus.STOPED.ordinal(),
                                         EquipmentStatus.STOPED.toString()
                                 );
+
+                                // 更新状态
+                                new Thread(statusUpdateTask).start();
                             } catch (Exception e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
@@ -724,44 +788,9 @@ public class MainActivity extends AppCompatActivity {
                 default:
                     break;
             }
-
-            // 更新状态
-            new Thread(statusUpdateTask).start();
         }
     };
 
-    // SimpleAdapter mSimpleAdapter = new SimpleAdapter(getApplicationContext(), mPopupWindowListItem, R.layout.main_popup_menu_item, new String[]{"item_icon", "item_title"}, new int[]{R.id.popup_menu_item_icon, R.id.popup_menu_item_title});
-    BaseAdapter mSimpleAdapter = new BaseAdapter() {
-
-        @Override
-        public int getCount() {
-            return mPopupWindowListItem.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            if (convertView == null) {
-                LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
-                convertView = inflater.inflate(R.layout.popup_menu_list_item, parent, false);
-            }
-
-            TextView popupMenuItemTitle = (TextView) convertView.findViewById(R.id.popup_menu_list_item_title);
-            popupMenuItemTitle.setText(mPopupWindowListItem.get(position).get("item_title").toString());
-
-            return convertView;
-        }
-    };
 
     private Runnable statusUpdateTask = new Runnable() {
         @Override
