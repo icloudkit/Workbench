@@ -408,10 +408,12 @@ public class ExplorerActivity extends AppCompatActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             try {
+                /*
                 HashMap<String, Object> item = (HashMap<String, Object>) parent.getItemAtPosition(position);
 
                 // 显示所选Item的ItemText
                 Toast.makeText(getApplicationContext(), (String) item.get("item_text"), Toast.LENGTH_SHORT).show();
+                */
 
                 request = new InputStreamVolleyRequest(Request.Method.GET, "http://www.guanmaoyun.com/main.html", new Response.Listener<byte[]>() {
                     @Override
@@ -559,7 +561,7 @@ public class ExplorerActivity extends AppCompatActivity {
     public void addData() {
 
         for (int i = 0; i < 3; i++) {
-            String items[] = {"语文", "数学", "英语", "体育", "计算机", "化学"};
+            String items[] = {"语文", "数学~~~~~~~~~~~~", "英语", "体育", "计算机", "化学~~~~~~~~~~~~"};
             for (String item : items) {
                 HashMap<String, String> map = new HashMap<String, String>();
                 map.put("item_text", item);
