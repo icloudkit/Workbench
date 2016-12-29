@@ -16,6 +16,7 @@
 package cn.com.teamlink.workbench;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.net.wifi.WifiInfo;
@@ -118,6 +119,9 @@ public class MainActivity extends AppCompatActivity {
         equipmentService = new EquipmentServiceImpl();
         // 开启一个子线程，进行网络操作，等待有返回结果，使用handler通知UI
         new Thread(networkTask).start();
+
+        // Snackbar.make(mToolbar, "user.dir:" + System.getProperty("user.dir"), Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(mToolbar, "getFilesDir:" + getFilesDir(), Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -332,9 +336,15 @@ public class MainActivity extends AppCompatActivity {
                     Snackbar.make(mToolbar, "Click Search", Snackbar.LENGTH_SHORT).show();
                     break;
                 */
-                case R.id.action_share:
+                case R.id.action_explorer:
                     // TODO
                     // Snackbar.make(mToolbar, "Click Share", Snackbar.LENGTH_SHORT).show();
+
+                    Intent intent = new Intent(MainActivity.this, ExplorerActivity.class);
+                    MainActivity.this.startActivity(intent);
+                    MainActivity.this.finish();
+                    // 设置切换动画
+                    // overridePendingTransition(R.anim.activity_open_enter, R.anim.activity_close_exit);
                     break;
                 case R.id.action_more:
                     // TODO
@@ -795,6 +805,11 @@ public class MainActivity extends AppCompatActivity {
     private Runnable statusUpdateTask = new Runnable() {
         @Override
         public void run() {
+
+            Message msg = new Message();
+            msg.what = STATUS_UPDATE_HANDLE;
+            Bundle data = new Bundle();
+
             try {
                 // handler.postDelayed(this, 1000);
 
@@ -807,21 +822,20 @@ public class MainActivity extends AppCompatActivity {
                         equipmentStatus.get("status_desc"),
                         equipmentStatus.get("timestamp")
                 );
-                Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getApplicationContext(), value, Toast.LENGTH_SHORT).show();
 
-                Message msg = new Message();
-                msg.what = STATUS_UPDATE_HANDLE;
-                Bundle data = new Bundle();
                 data.putString("text", value);
-                // data.putSerializable("data", "");
-                msg.setData(data);
-                handler.sendMessage(msg);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                data.putString("text", e.getLocalizedMessage());
+                Log.e(TAG, e.getLocalizedMessage(), e);
             }
 
+            // data.putSerializable("data", "");
+            msg.setData(data);
+            handler.sendMessage(msg);
         }
     };
 

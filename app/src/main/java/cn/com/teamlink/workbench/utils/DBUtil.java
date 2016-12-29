@@ -15,8 +15,10 @@
  */
 package cn.com.teamlink.workbench.utils;
 
+import android.os.Environment;
 import android.support.design.widget.Snackbar;
 
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -54,10 +56,10 @@ public class DBUtil {
 
     // private static String url = "jdbc:mysql://127.0.0.1:3306/wbdata?useUnicode=true&characterEncoding=UTF-8";
     // private static String url = "jdbc:mysql://192.168.0.18:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&maxReconnects=10";
-    private static String url = "jdbc:mysql://192.168.0.18:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
+    // private static String url = "jdbc:mysql://192.168.0.18:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
     // private static String url = "jdbc:mysql://127.0.0.1:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
     // private static String url = "jdbc:mysql://192.168.1.169:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
-    // private static String url = "jdbc:mysql://192.168.1.102:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
+    private static String url = "jdbc:mysql://192.168.1.102:3306/wbdata?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false";
     private static String username = "root";
     private static String password = "root";
     private static String driverName = "com.mysql.jdbc.Driver";
@@ -67,18 +69,17 @@ public class DBUtil {
         try {
             // 从文件中取内容
             // FileInputStream fis = new FileInputStream(System.getProperty("user.dir") + "/jdbc.properties");
-            // properties.load(fis);
+            FileInputStream fis = new FileInputStream(Environment.getExternalStorageDirectory() + "/jdbc.properties");
+            props.load(fis);
 
             // props.load(DBUtil.class.getClassLoader().getResourceAsStream("dbcp.properties"));
             // dataSource = BasicDataSourceFactory.createDataSource(props);
 
             // 获取信息
-            /*
             driverName = props.getProperty("jdbc.driver");
             url = props.getProperty("jdbc.url");
             username = props.getProperty("jdbc.username");
             password = props.getProperty("jdbc.password");
-            */
         } catch (Exception e) {
             e.printStackTrace();
         }
