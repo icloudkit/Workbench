@@ -15,14 +15,18 @@
  */
 package cn.com.teamlink.workbench;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -100,7 +104,7 @@ public class ExplorerActivity extends AppCompatActivity {
             );
             */
 
-            gridViewListItemAdapter =new BaseAdapter() {
+            gridViewListItemAdapter = new BaseAdapter() {
 
                 @Override
                 public int getCount() {
@@ -415,122 +419,160 @@ public class ExplorerActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), (String) item.get("item_text"), Toast.LENGTH_SHORT).show();
                 */
 
-                request = new InputStreamVolleyRequest(Request.Method.GET, "http://www.guanmaoyun.com/main.html", new Response.Listener<byte[]>() {
-                    @Override
-                    public void onResponse(byte[] bytes) {
-                        // HashMap<String, Object> map = new HashMap<String, Object>();
-                        try {
-                            if (bytes != null) {
+                // Verify that all required contact permissions have been granted.
+                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
 
-                        /*
-                        // Read file name from headers (We have configured API to send file name in "Content-Disposition" header in following format: "File-Name:File-Format" example "MyDoc:pdf"
-                        String content = request.responseHeaders.get("Content-Disposition");
-                        StringTokenizer st = new StringTokenizer(content, "=");
+                    // WRITE_EXTERNAL_STORAGE permissions have not been granted.
+                    /*
+                    Log.i(TAG, "Contact permissions has NOT been granted. Requesting permissions.");
+                    // 申请WRITE_EXTERNAL_STORAGE权限
+                    ActivityCompat.requestPermissions(ExplorerActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+                    */
 
-                        int numberOfTokens = st.countTokens();
-                        String[] arrTag = new String[numberOfTokens];
-                        int x = 0;
-                        while (st.hasMoreTokens()) {
-                            arrTag[x] = st.nextToken();
-                        }
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(ExplorerActivity.this, Manifest.permission.READ_CONTACTS) || ActivityCompat.shouldShowRequestPermissionRationale(ExplorerActivity.this, Manifest.permission.WRITE_CONTACTS)) {
 
-                        String filename = arrTag[1];
-                        */
+                        // Provide an additional rationale to the user if the permission was not granted
+                        // and the user would benefit from additional context for the use of the permission.
+                        // For example, if the request has been denied previously.
+                        Log.i(TAG, "Displaying contacts permission rationale to provide additional context.");
 
-                                String filename = "test.html";
-                                // filename = filename.replace(":", ".");
-                                Log.i("DEBUG::FILE NAME", filename);
-
-                                InputStream input = null;
-                                BufferedOutputStream output = null;
-                                try {
-                                    long lenghtOfFile = bytes.length;
-
-                                    //covert reponse to input stream
-                                    input = new ByteArrayInputStream(bytes);
-
-                                    //Create a file on desired path and write stream data to it
-                                    // File path = Environment.getExternalStorageDirectory();
-                                    // File sd = Environment.getExternalStorageDirectory();
-                                    // sd.canWrite();
-
-                                    Log.d(TAG, "检验sdcard是否可用?");
-                                    //判断sdcard是否存在?
-                                    if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-                                        Log.d(TAG, "sdcard不可用!");
-                                        Toast.makeText(getApplicationContext(), "没有找到SDCard!", Toast.LENGTH_LONG);
-                                        return;
+                        // Display a SnackBar with an explanation and a button to trigger the request.
+                        Snackbar.make(view, "提示:", Snackbar.LENGTH_INDEFINITE)
+                                .setAction("确定", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) {
+                                        ActivityCompat.requestPermissions(ExplorerActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
                                     }
-                                    ;
+                                })
+                                .show();
+                    } else {
+                        // Contact permissions have not been granted yet. Request them directly.
+                        ActivityCompat.requestPermissions(ExplorerActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                    }
+                    // END_INCLUDE(contacts_permission_request)
+                } else {
 
-                                    // File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                                    // File path = Environment.getDownloadCacheDirectory();
-                                    // File path = Environment.getDataDirectory();
-                                    // Log.i("DEBUG::DataDirectory:", Environment.getDataDirectory().getAbsolutePath());
-                                    File path = Environment.getExternalStorageDirectory();
+                    // Contact permissions have been granted. Show the contacts fragment.
+                    Log.i(TAG, "WRITE_EXTERNAL_STORAGE permissions have already been granted. Displaying contact details.");
 
-                                    // 获取sdcard的大小
-                                    long blockSize = 0;
-                                    long blockCount = 0;
-                                    StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
-                                    // FIXME Make sure we're running on HONEYCOMB or higher to use APIs
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                                        blockSize = statFs.getBlockSizeLong();
-                                        blockCount = statFs.getBlockSizeLong();
-                                    } else {
-                                        blockSize = statFs.getBlockSize();
-                                        blockCount = statFs.getBlockCount();
+                    // TODO
+                    request = new InputStreamVolleyRequest(Request.Method.GET, "http://www.guanmaoyun.com/main.html", new Response.Listener<byte[]>() {
+                        @Override
+                        public void onResponse(byte[] bytes) {
+                            // HashMap<String, Object> map = new HashMap<String, Object>();
+                            try {
+                                if (bytes != null) {
+
+                                    /*
+                                    // Read file name from headers (We have configured API to send file name in "Content-Disposition" header in following format: "File-Name:File-Format" example "MyDoc:pdf"
+                                    String content = request.responseHeaders.get("Content-Disposition");
+                                    StringTokenizer st = new StringTokenizer(content, "=");
+
+                                    int numberOfTokens = st.countTokens();
+                                    String[] arrTag = new String[numberOfTokens];
+                                    int x = 0;
+                                    while (st.hasMoreTokens()) {
+                                        arrTag[x] = st.nextToken();
                                     }
-                                    long sdCardSize = blockSize * blockCount;
-                                    Log.d(TAG, String.valueOf(sdCardSize));
 
-                                    // new java.io.File((getActivity().getApplicationContext().getFileStreamPath("FileName.xml").getPath()));
-                                    // org.apache.commons.io.FileUtils.copyInputStreamToFile(is, file);
-                                    Log.i("DEBUG::FILE PATH", path.getAbsolutePath());
+                                    String filename = arrTag[1];
+                                    */
 
-                                    File file = new File(path, filename);
-                                    // map.put("resume_path", file.toString());
-                                    Log.i("DEBUG::FILE PATH", file.getAbsolutePath());
+                                    String filename = "test.html";
+                                    // filename = filename.replace(":", ".");
+                                    Log.i("DEBUG::FILE NAME", filename);
 
-                                    output = new BufferedOutputStream(new FileOutputStream(file));
-                                    byte data[] = new byte[1024];
+                                    InputStream input = null;
+                                    BufferedOutputStream output = null;
+                                    try {
+                                        long lenghtOfFile = bytes.length;
 
-                                    int count = 0;
-                                    long total = 0;
+                                        //covert reponse to input stream
+                                        input = new ByteArrayInputStream(bytes);
 
-                                    while ((count = input.read(data)) != -1) {
-                                        total += count;
-                                        output.write(data, 0, count);
-                                    }
-                                } catch (IOException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                } finally {
-                                    if (output != null) {
-                                        output.flush();
-                                    }
-                                    if (output != null) {
-                                        output.close();
-                                    }
-                                    if (output != null) {
-                                        input.close();
+                                        //Create a file on desired path and write stream data to it
+                                        // File path = Environment.getExternalStorageDirectory();
+                                        // File sd = Environment.getExternalStorageDirectory();
+                                        // sd.canWrite();
+
+                                        Log.d(TAG, "检验sdcard是否可用?");
+                                        //判断sdcard是否存在?
+                                        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+                                            Log.d(TAG, "sdcard不可用!");
+                                            Toast.makeText(getApplicationContext(), "没有找到SDCard!", Toast.LENGTH_LONG);
+                                            return;
+                                        }
+                                        ;
+
+                                        // File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                                        // File path = Environment.getDownloadCacheDirectory();
+                                        // File path = Environment.getDataDirectory();
+                                        // Log.i("DEBUG::DataDirectory:", Environment.getDataDirectory().getAbsolutePath());
+                                        File path = Environment.getExternalStorageDirectory();
+
+                                        // 获取sdcard的大小
+                                        long blockSize = 0;
+                                        long blockCount = 0;
+                                        StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
+                                        // FIXME Make sure we're running on HONEYCOMB or higher to use APIs
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                                            blockSize = statFs.getBlockSizeLong();
+                                            blockCount = statFs.getBlockSizeLong();
+                                        } else {
+                                            blockSize = statFs.getBlockSize();
+                                            blockCount = statFs.getBlockCount();
+                                        }
+                                        long sdCardSize = blockSize * blockCount;
+                                        Log.d(TAG, String.valueOf(sdCardSize));
+
+                                        // new java.io.File((getActivity().getApplicationContext().getFileStreamPath("FileName.xml").getPath()));
+                                        // org.apache.commons.io.FileUtils.copyInputStreamToFile(is, file);
+                                        Log.i("DEBUG::FILE PATH", path.getAbsolutePath());
+
+                                        File file = new File(path, filename);
+                                        // map.put("resume_path", file.toString());
+                                        Log.i("DEBUG::FILE PATH", file.getAbsolutePath());
+
+                                        output = new BufferedOutputStream(new FileOutputStream(file));
+                                        byte data[] = new byte[1024];
+
+                                        int count = 0;
+                                        long total = 0;
+
+                                        while ((count = input.read(data)) != -1) {
+                                            total += count;
+                                            output.write(data, 0, count);
+                                        }
+                                    } catch (IOException e) {
+                                        // TODO Auto-generated catch block
+                                        e.printStackTrace();
+                                    } finally {
+                                        if (output != null) {
+                                            output.flush();
+                                        }
+                                        if (output != null) {
+                                            output.close();
+                                        }
+                                        if (output != null) {
+                                            input.close();
+                                        }
                                     }
                                 }
+                            } catch (Exception e) {
+                                // TODO Auto-generated catch block
+                                Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                                Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG);
                             }
-                        } catch (Exception e) {
-                            // TODO Auto-generated catch block
-                            Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
-                            Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_LONG);
                         }
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError volleyError) {
 
-                    }
-                }, null);
-                RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
-                mRequestQueue.add(request);
+                        }
+                    }, null);
+                    RequestQueue mRequestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
+                    mRequestQueue.add(request);
+                }
 
             } catch (Exception e) {
 
@@ -546,6 +588,57 @@ public class ExplorerActivity extends AppCompatActivity {
             }
         }
     }
+
+    /*
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        handleGrantResults(requestCode,grantResults);
+    }
+
+    private void handleGrantResults(int requestCode, int[] grantResults) {
+        if (requestCode == WRITE_EXTERNAL_STORAGE_REQUEST_CODE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission Granted 获得权限后执行xxx
+            } else {
+                // Permission Denied 拒绝后xx的操作。
+            }
+        }
+    }
+
+    private void handleContactPermission() {
+        if (Integer.parseInt(Build.VERSION.SDK)>=23) {
+            int hasWriteContactsPermission = checkSelfPermission(Manifest.permission.WRITE_CONTACTS);
+            if (hasWriteContactsPermission != PackageManager.PERMISSION_GRANTED) {
+                if (!shouldShowRequestPermissionRationale(Manifest.permission.WRITE_CONTACTS)) {
+                    showMessageOKCancel("You need to allow access to Contacts",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    requestContactPermission();//确定后申请权限。
+                                }
+                            }
+                    );
+                    return;
+                }
+                requestContactPermission();//没有权限的话，申请。
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+      super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+      List<Fragment> fragments = getChildFragmentManager().getFragments();
+      if (fragments != null) {
+          for (Fragment fragment : fragments) {
+              if (fragment != null) {
+                  fragment.onRequestPermissionsResult(requestCode,permissions,grantResults);
+              }
+          }
+      }
+    }
+    */
 
     public void addHeader() {
         String items[] = {"星期一", "星期二", "星期三", "星期四", "星期五", "星期六"};
